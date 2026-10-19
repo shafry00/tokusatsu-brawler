@@ -130,8 +130,26 @@ the rule that makes the shipped mannequin look deliberate. See `_dressHero` in
 Materials whose name contains `eye` are turned emissive. Name an eye material `Eye` and
 it will glow.
 
-## Billboards (optional)
+## Roblox
 
+The same pack feeds the Roblox build, with a shorter route: Roblox cannot read glTF at
+runtime, so [`../tools/glb_to_roblox.py`](../tools/glb_to_roblox.py) bakes a `.glb` into
+Luau once — a skeleton module and one module per clip — and the game plays it by placing
+anchored parts. There is no import step and nothing to upload.
+
+```bash
+tools/glb_to_roblox.py assets/models/anim-ual.glb --report
+tools/glb_to_roblox.py assets/models/anim-ual.glb --out roblox/src/shared
+```
+
+Because the rest pose and the clips come out of the *same file*, the generated rig needs
+no retargeting: rule 1 above is satisfied by construction. The remaining rules still
+apply — feet at `y = 0`, and clips that answer to slot names (`Content.clips` is the one
+table that maps slots to clip names). Roblox's own limits are in
+[`../docs/ROBLOX.md`](../docs/ROBLOX.md); every model in this folder passes them, the
+largest at 13,744 triangles against a 20,000 budget.
+
+## Billboards (optional)
 The 2.5D sprite path in `assets/sprites/` is a fallback, not a requirement. Any PNG that
 is not there is replaced at runtime by a procedurally drawn silhouette, so deleting the
 folder is a supported configuration. See [`../docs/SPRITES.md`](../docs/SPRITES.md).

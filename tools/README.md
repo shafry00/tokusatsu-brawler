@@ -1,7 +1,8 @@
 # The asset pipeline
 
-Four small Python tools. They parse and write `.glb` themselves — **numpy is the only
-dependency**, there is no glTF library involved:
+Five small Python tools. They parse and write `.glb` themselves — **numpy is the only
+dependency**, and only the retargeting pair needs even that; `glb_to_roblox.py` is
+standard library only:
 
 ```bash
 python3 -m pip install numpy
@@ -12,6 +13,7 @@ python3 -m pip install numpy
 | `inspect_glb.py` | look inside a file before committing to a pipeline: triangles, skin, bones in the rest pose, clips, materials |
 | `retarget.py` | move the game's clip set onto a different model's own skeleton |
 | `hero_align.py` | re-express a clip library through the rest-pose difference between two rigs |
+| `glb_to_roblox.py` | audit a model against Roblox's limits, then bake its rig and clips into Luau |
 | `strip_animations.py` | split the mesh from the clips, and repack the buffer |
 | `fetch-cc0-assets.sh` | pull a pack in and report what is in it |
 
@@ -37,6 +39,10 @@ tools/strip_animations.py lib.glb -o out.glb --keep Idle_Loop # or a subset
 # rest-pose mismatch
 tools/hero_align.py --dry
 tools/hero_align.py --target hero.glb --clips anim-ual.glb --install
+
+# the Roblox build: audit, then bake the rig and its clips into Luau
+tools/glb_to_roblox.py model.glb --report
+tools/glb_to_roblox.py model.glb --out ../roblox/src/shared
 ```
 
 ## `inspect_glb.py`
@@ -106,6 +112,37 @@ tools/hero_align.py --dry
 
 `--dry` measures and writes nothing. The residual error line is the proof it worked: on
 this project's own hero it reports 0.03°.
+
+## `glb_to_roblox.py`
+
+Two jobs, and the first one is worth running on any model you are thinking about using,
+even for the web build, because Roblox's limits are a decent proxy for "is this mesh
+sane": 20,000 triangles per mesh and at most 4 bone influences per vertex.
+
+```bash
+tools/glb_to_roblox.py model.glb --report          # audit only, writes nothing
+tools/glb_to_roblox.py model.glb --out dir         # bake Rig.luau + clips/
+tools/glb_to_roblox.py model.glb --out dir --quiet # just the summary line
+```
+
+The bake is the interesting half. In order: read the skeleton in rest pose; accumulate
+node scale down the hierarchy (glTF translations are in parent units, so a rig exported
+at 1/100 scale would otherwise collapse); thin **leaf-only** joints — rank candidates by
+skin-influence mass and depth, honouring `--max-joints` and `--prune` — so a kept bone's
+parent is always kept and no motion is lost; strip the root joint's travelling
+translation in world axes (`--root-motion strip|keep|none`); work out which way the model
+walks, from the clip that travels furthest, and record it as `forward` in model space
+(`--yaw 180` if the guess is wrong); then decimate to `--fps` and write one ModuleScript
+per clip plus an `init.luau` index of thunks.
+
+Playback in Luau is `frames[joint] = frames[parent] * rest[joint] * delta[joint]`, which is
+exactly what this tool divides out when it bakes `delta` — so the two cannot drift. The
+generated rig needs no retargeting for the same reason: the rest pose and the clips come
+from the same file. Full write-up: [`../docs/ROBLOX.md`](../docs/ROBLOX.md).
+
+Verified on three rigs with different shapes — `anim-ual.glb` (65 → 23 joints, 15 clips,
+5.6 studs), `kaiju-frog.glb` (43 → 21, 8 clips, 6.7 studs) and `kaiju-dragon.glb`
+(21 joints, keeping its four-segment wings, 6 clips, 8.0 studs).
 
 ## `strip_animations.py`
 

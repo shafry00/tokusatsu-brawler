@@ -1,0 +1,33 @@
+{
+	"name": "tokusatsu-brawler",
+	"tree": {
+		"$className": "DataModel",
+
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"Battle": {
+				"$className": "Folder",
+				"$path": "src/shared"
+			}
+		},
+
+		"ServerScriptService": {
+			"$className": "ServerScriptService",
+			"Battle": {
+				"$className": "Folder",
+				"$path": "src/server"
+			}
+		},
+
+		"StarterPlayer": {
+			"$className": "StarterPlayer",
+			"StarterPlayerScripts": {
+				"$className": "StarterPlayerScripts",
+				"Battle": {
+					"$className": "Folder",
+					"$path": "src/client"
+				}
+			}
+		}
+	}
+}

@@ -32,6 +32,21 @@ at runtime</sub></p>
 
 ![stage select](docs/img/stage-select.jpg)
 
+## Two builds
+
+This repo ships the same game twice, from the same content tables:
+
+| Build | Runs on | Characters |
+|---|---|---|
+| [`/`](index.html) — the engine described below | any static server, three.js r128, no build step | rigged skinned `.glb`, loaded at runtime |
+| [`roblox/`](roblox/README.md) | Roblox, via [Rojo](https://rojo.space) or a copy-paste | `.glb` baked offline into Luau by [`tools/glb_to_roblox.py`](tools/glb_to_roblox.py), drawn as anchored parts |
+
+Roblox has no runtime glTF loader, so the Roblox build takes a different route to the same
+game: the tool bakes a rig and its clips into Luau modules once, `Figure.luau` plays them
+by placing parts, and the result ships with no uploads and no asset ids. See
+[`docs/ROBLOX.md`](docs/ROBLOX.md) for the reasoning and [`roblox/README.md`](roblox/README.md)
+to run it.
+
 ## Quickstart
 
 ```bash
@@ -108,6 +123,15 @@ That is the flow this project was built around — see
 downloaded `.glb` to a character in the game, including the two traps that cost the
 most time (rest-pose mismatch, and skinned bounds that lie about size).
 
+For the **Roblox** build the same contract applies to the source `.glb`, but the route is
+shorter — the tool bakes the rig and its clips into Luau, so there is no retargeting and
+no import step:
+
+```bash
+tools/glb_to_roblox.py ~/dl/my-kaiju.glb --report        # what will this cost on Roblox?
+tools/glb_to_roblox.py ~/dl/my-kaiju.glb --out roblox/src/shared
+```
+
 ## Architecture
 
 | File | Role |
@@ -127,12 +151,14 @@ most time (rest-pose mismatch, and skinned bounds that lie about size).
 | `js/game.js` | Orchestrator: camera, input, waves, bosses, pickups, allies, HUD, occluder fade |
 | `assets/models/` | The CC0 example pack + the asset contract |
 | `tools/` | The asset pipeline: retargeting, clip realignment, inspection |
+| `roblox/` | The same game for Roblox: Luau modules, Rojo project, baked rig |
 | `docs/` | Everything below |
 
 Deeper dives:
 
 * [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — how the modules fit together, the actor abstraction, the update loop
 * [`docs/ASSET-PIPELINE.md`](docs/ASSET-PIPELINE.md) — downloaded `.glb` → playable character
+* [`docs/ROBLOX.md`](docs/ROBLOX.md) — the Roblox build: baking a `.glb` into Luau, Roblox's import budgets, why there is no `Motor6D`, and what is and is not Studio-tested
 * [`docs/CONTENT.md`](docs/CONTENT.md) — reskin this example into your own game, file by file
 * [`docs/LEVELS.md`](docs/LEVELS.md) — the stage config, the prop system, adding a biome
 * [`docs/FX.md`](docs/FX.md) — the effect API and recipes that read well in third person
@@ -152,6 +178,9 @@ stat lives in a handful of tables (`HERO` and `KAIJU` in `js/models.js`, `SPECIE
 * **Code:** [MIT](LICENSE) — use it commercially, no strings.
 * **Example art pack (`assets/models/`):** CC0 / public domain. See
   [`CREDITS.md`](CREDITS.md) for the per-file attribution.
+* **The Roblox build (`roblox/`):** the same MIT code, plus generated Luau
+  (`Rig.luau`, `clips/`) baked from the CC0 mannequin in the example pack. Nothing in it
+  needs uploading, and no asset ids are baked in.
 * Ultraman and related characters are trademarks of Tsuburaya Productions. This is an
   unofficial, non-commercial fan project and is not affiliated with or endorsed by
   them. If you build on this, **replace the example names and any character-derived

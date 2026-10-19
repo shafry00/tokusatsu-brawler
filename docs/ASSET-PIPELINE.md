@@ -213,6 +213,44 @@ understand, because those can hide buffer references.
 
 ---
 
+## Route C — Roblox: bake the rig into Luau
+
+Roblox has no runtime glTF loader, so none of the above applies to the Roblox build.
+Instead, `tools/glb_to_roblox.py` runs **once, offline** and turns a `.glb` into Luau: a
+skeleton module and one module per clip. The creature is then drawn by placing anchored
+parts, not by skinning a mesh, so the whole skinned-bounds / rest-pose-mismatch class of
+bug disappears.
+
+```bash
+tools/glb_to_roblox.py kaiju.glb --report                        # audit, writes nothing
+tools/glb_to_roblox.py kaiju.glb --out ../roblox/src/shared      # bake it
+```
+
+It does five things, in this order:
+
+1. **Reads the skeleton in rest pose** — each joint's local position and quaternion.
+2. **Accumulates node scale** down the hierarchy, because glTF translations are in parent
+   units and a rig exported at 1/100 scale would otherwise collapse to a dot.
+3. **Thins leaf joints** — ranked by skin-influence mass and depth, so fingers go before
+   anything that holds a limb together. Only leaves are ever removed, which guarantees a
+   kept bone's parent is kept and no motion is lost. `--max-joints`, `--prune`.
+4. **Strips the root joint's travelling translation** in world axes, so the clips do not
+   fight the game's movement. `--root-motion strip|keep|none`.
+5. **Works out which way the model walks** and records it as `forward`, in model space.
+   `--yaw 180` when the guess is wrong — the single most common fix on a new rig.
+
+Then it decimates to `--fps` and writes the modules. Playback is
+`frames[joint] = frames[parent] * rest[joint] * delta[joint]`, which is the inverse of
+what the tool divides out, so the two cannot drift — and because the rest pose and the
+clips come from the same file, **Route C never needs the retargeting in Route B**.
+
+What you keep from the contract above: feet at `y = 0`, and clips that answer to slot
+names (`Content.clips` in the Roblox build is the `FAMILIES` equivalent). What you lose:
+the mesh. See [`ROBLOX.md`](ROBLOX.md) for the budgets, and for the route back to a real
+skinned mesh if you want one.
+
+---
+
 ## The whole route, end to end
 
 ```bash
@@ -231,6 +269,10 @@ tools/hero_align.py --target assets/models/hero.glb --clips assets/models/anim-u
 $EDITOR js/models.js        # one line in KAIJU, or swap the hero file
 # 4. look at it
 python3 -m http.server 8777
+
+# and, for the Roblox build, the same model without any of the above:
+tools/glb_to_roblox.py ~/Downloads/kaiju.glb --report
+tools/glb_to_roblox.py ~/Downloads/kaiju.glb --out roblox/src/shared
 ```
 
 ## Troubleshooting

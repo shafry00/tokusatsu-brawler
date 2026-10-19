@@ -35,6 +35,18 @@ The `.glb` files were repacked by this project's own tools (`tools/`) but the me
 skeletons, skin weights and clip data are the originals, unmodified apart from the
 operations documented in `docs/ASSET-PIPELINE.md`.
 
+## The Roblox build — `roblox/`
+
+`roblox/src/shared/Rig.luau` and everything in `roblox/src/shared/clips/` are **generated
+Luau**: they are the skeleton, rest pose and 15 clips of `assets/models/anim-ual.glb`
+above, re-expressed as tables by `tools/glb_to_roblox.py`. No new art was added — the
+same CC0 mannequin and its clips, baked so that Roblox can play them without a runtime
+glTF loader. See [`docs/ROBLOX.md`](docs/ROBLOX.md).
+
+The creatures the game spawns are built from Roblox `Part` primitives at runtime by
+`Figure.luau`, so there is no third-party art in the Roblox build beyond that one CC0
+source file. Nothing in it requires an uploaded asset id.
+
 ## Vendored libraries
 
 | File | Source | Licence |
