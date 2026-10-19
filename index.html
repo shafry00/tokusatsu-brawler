@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tokusatsu Brawler: game aksi pahlawan raksasa di browser</title>
+  <meta name="description" content="Tokusatsu Brawler adalah game aksi pahlawan raksasa lawan monster. 9 level, 9 boss, langsung main di browser tanpa instal apa pun.">
+  <meta name="theme-color" content="#b7bff0">
+  <meta property="og:title" content="Tokusatsu Brawler">
+  <meta property="og:description" content="Jadi pahlawan raksasa dan hajar monster. 9 level, 9 boss, langsung main di browser.">
+  <meta property="og:image" content="assets/img/gameplay-1.jpg">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Rubik:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <span class="orb orb-a"></span><span class="orb orb-b"></span><span class="orb orb-c"></span>
+    <span class="grain"></span>
+  </div>
+
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="Tokusatsu Brawler, ke atas">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 1l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z" fill="currentColor"/></svg>
+      <span>TOKUSATSU<b>BRAWLER</b></span>
+    </a>
+    <nav class="nav-links" aria-label="Menu utama">
+      <a href="#fitur">Fitur</a>
+      <a href="#cara-main">Cara main</a>
+      <a href="#level">Level</a>
+      <a href="#cerita">Cerita</a>
+    </nav>
+    <a class="btn btn-small" href="https://ultraman-nine-trials.pages.dev/" target="_blank" rel="noopener">Main sekarang</a>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <p class="ghost" aria-hidden="true">SYSTEM<br>READY</p>
+      <div class="hero-copy">
+        <p class="chip chip-dark"><span class="dot"></span> NEW GAME NO.01 · PROYEK FAN</p>
+        <h1>Jadi pahlawan raksasa. <em>Hajar monsternya.</em></h1>
+        <p class="lead">Game aksi bergaya tokusatsu yang langsung jalan di browser. 9 level, 9 boss, dan nol instalasi. Buka link, tekan mulai, selesai.</p>
+        <div class="cta-row">
+          <a class="btn" href="https://ultraman-nine-trials.pages.dev/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>
+            Main di browser
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/shafry00/tokusatsu-brawler" target="_blank" rel="noopener">Lihat proyeknya</a>
+        </div>
+        <ul class="mini-stats" aria-label="Ringkasan game">
+          <li><b>9</b><span>level</span></li>
+          <li><b>9</b><span>boss</span></li>
+          <li><b>0</b><span>instalasi</span></li>
+        </ul>
+      </div>
+
+      <div class="hero-visual">
+        <figure class="window">
+          <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>tokusatsu-brawler</span></div>
+          <img src="assets/img/gameplay-1.jpg" alt="Cuplikan gameplay: pahlawan raksasa berjalan di jalanan kota di antara gedung-gedung" width="1400" height="788" fetchpriority="high">
+          <a class="play-pill" href="https://ultraman-nine-trials.pages.dev/" target="_blank" rel="noopener">▶ MAIN</a>
+        </figure>
+
+        <aside class="card profile" aria-label="Kartu profil pahlawan">
+          <img src="assets/img/avatar.jpg" alt="" width="64" height="64">
+          <div>
+            <p class="tag">PAHLAWAN NO.01</p>
+            <p class="profile-line">ULTRA TIME <b>3:00</b></p>
+            <div class="bar"><span style="--v:100%"></span></div>
+          </div>
+        </aside>
+
+        <aside class="card widget" aria-label="Statistik singkat">
+          <div class="pill-stat"><span class="ico">◆</span><b>9</b><small>level</small></div>
+          <div class="pill-stat"><span class="ico">✦</span><b>9</b><small>boss</small></div>
+          <div class="ring" style="--p:100" aria-label="Energi awal 100 persen"><span>100%</span></div>
+        </aside>
+
+        <p class="ribbon"><i>◆◆◆</i> Demo bisa dimainkan sekarang</p>
+      </div>
+    </section>
+
+    <!-- FITUR -->
+    <section class="section" id="fitur">
+      <header class="section-head">
+        <p class="chip">FITUR</p>
+        <h2>Semua yang bikin pertarungan terasa seru</h2>
+      </header>
+      <div class="grid features">
+        <article class="card feat feat-wide">
+          <p class="tag">NO.01</p>
+          <h3>Pertarungan yang terasa mantap</h3>
+          <p>Serangan beruntun, pukulan berat yang memecah pertahanan, tembakan sinar, tebasan, dan jurus pamungkas. Setiap pukulan ada efek jeda dan layar bergetar, jadi kena atau tidak kena langsung terasa.</p>
+        </article>
+        <article class="card feat">
+          <p class="tag">NO.02</p>
+          <h3>Terbang dan meluncur</h3>
+          <p>Tahan Space di udara untuk terbang, tahan Shift untuk meluncur turun menghantam musuh.</p>
+        </article>
+        <article class="card feat">
+          <p class="tag">NO.03</p>
+          <h3>9 level, 9 suasana</h3>
+          <p>Dari pusat kota, langit di atas awan, sampai ruang angkasa. Tiap level punya tampilan dan lawan sendiri.</p>
+        </article>
+        <article class="card feat">
+          <p class="tag">NO.04</p>
+          <h3>Bisa dimainkan di HP</h3>
+          <p>Ada kontrol layar sentuh, jadi buka link dari HP juga jalan.</p>
+        </article>
+        <article class="card feat">
+          <p class="tag">NO.05</p>
+          <h3>Suara dibuat langsung</h3>
+          <p>Semua efek suara dibuat di browser, tanpa file audio. Hasilnya ringan dan cepat terbuka.</p>
+        </article>
+        <article class="card feat feat-full">
+          <p class="tag">NO.06</p>
+          <h3>Progres tersimpan</h3>
+          <p>Level yang sudah dibuka dan skor terbaik tersimpan otomatis di browsermu.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- JURUS -->
+    <section class="section">
+      <div class="moves card-dark">
+        <div class="moves-copy">
+          <p class="tag tag-light">#JURUS</p>
+          <h2>Enam tombol, jurus yang cukup banyak buat bereksperimen</h2>
+          <p>Gabungkan serangan ringan jadi combo, simpan energi untuk sinar, dan pakai lari cepat untuk menghindar tepat waktu. Awasi Ultra Time di pojok layar: kalau habis, tenagamu terkuras dan damage yang kamu terima berlipat.</p>
+        </div>
+        <ul class="keys" aria-label="Daftar tombol utama">
+          <li><kbd>J</kbd><span>Serangan ringan, 3 pukulan beruntun</span></li>
+          <li><kbd>K</kbd><span>Pukulan berat, memecah pertahanan</span></li>
+          <li><kbd>U</kbd><span>Tembakan sinar (butuh 40 energi)</span></li>
+          <li><kbd>I</kbd><span>Tebasan cincin yang menembus musuh</span></li>
+          <li><kbd>Q</kbd><span>Lari cepat dengan frame kebal</span></li>
+          <li><kbd>F</kbd><span>Jurus pamungkas saat diminta</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- CARA MAIN -->
+    <section class="section" id="cara-main">
+      <header class="section-head">
+        <p class="chip">CARA MAIN</p>
+        <h2>Tiga langkah, tanpa instal apa pun</h2>
+      </header>
+      <ol class="steps">
+        <li class="card"><span class="num">1</span><h3>Buka link demo</h3><p>Klik tombol Main di browser. Layar judul akan muncul.</p></li>
+        <li class="card"><span class="num">2</span><h3>Pilih Start Adventure</h3><p>Level pertama langsung terbuka. Level lain terbuka satu per satu setelah kamu menang.</p></li>
+        <li class="card"><span class="num">3</span><h3>Gerak dengan WASD</h3><p>Serang dengan J atau klik kiri. Di HP, pakai tombol di layar.</p></li>
+      </ol>
+      <div class="shot-pair">
+        <figure class="shot"><img src="assets/img/title-screen.jpg" alt="Layar judul game dengan tiga tombol: Start Adventure, Stage Select, dan Controls" loading="lazy" width="1400" height="788"><figcaption>Layar judul</figcaption></figure>
+        <figure class="shot"><img src="assets/img/controls.jpg" alt="Layar daftar kontrol keyboard dan mouse" loading="lazy" width="1400" height="788"><figcaption>Daftar kontrol</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- LEVEL -->
+    <section class="section" id="level">
+      <header class="section-head">
+        <p class="chip">LEVEL</p>
+        <h2>Sembilan ujian, makin lama makin berat</h2>
+      </header>
+      <ol class="levels">
+        <li><b>01</b><div><h3>Pusat kota</h3><p>Monster mendarat di tengah kota.</p></div><em class="lv easy">Mudah</em></li>
+        <li><b>02</b><div><h3>Kota terbakar</h3><p>Reruntuhan menyala, monster lepas.</p></div><em class="lv easy">Mudah</em></li>
+        <li><b>03</b><div><h3>Di atas awan</h3><p>Pertempuran udara, saatnya terbang.</p></div><em class="lv easy">Mudah</em></li>
+        <li><b>04</b><div><h3>Jebakan kembaran</h3><p>Musuh ada di mana-mana. Cari yang asli.</p></div><em class="lv normal">Normal</em></li>
+        <li><b>05</b><div><h3>Terowongan gelap</h3><p>Tanpa cahaya, ada yang menunggu di bawah.</p></div><em class="lv normal">Normal</em></li>
+        <li><b>06</b><div><h3>Kawah api</h3><p>Gunung berapi terbangun.</p></div><em class="lv normal">Normal</em></li>
+        <li><b>07</b><div><h3>Benteng baja</h3><p>Mesin perang alien sudah dikerahkan.</p></div><em class="lv hard">Sulit</em></li>
+        <li><b>08</b><div><h3>Di balik nebula</h3><p>Sesuatu yang sangat tua mulai bangun.</p></div><em class="lv hard">Sulit</em></li>
+        <li class="final"><b>09</b><div><h3>Ancaman terakhir</h3><p>Semuanya berakhir di sini.</p></div><em class="lv extreme">Ekstrem</em></li>
+      </ol>
+      <div class="shot-pair">
+        <figure class="shot"><img src="assets/img/gameplay-2.jpg" alt="Cuplikan gameplay: pahlawan raksasa melompat di atas persimpangan kota" loading="lazy" width="1400" height="788"><figcaption>Melompat di atas kota</figcaption></figure>
+        <figure class="shot"><img src="assets/img/stage-select.jpg" alt="Layar pilih level berisi sembilan kartu level" loading="lazy" width="1400" height="788"><figcaption>Layar pilih level</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- CERITA -->
+    <section class="section" id="cerita">
+      <header class="section-head">
+        <p class="chip">CERITA DI BALIK GAME</p>
+        <h2>Dibuat karena bikin prototype game terlalu lama</h2>
+      </header>
+      <div class="story">
+        <div class="story-copy">
+          <p>Tokusatsu Brawler lahir dari masalah yang sederhana: untuk pitching ke investor, aku butuh game yang bisa dimainkan, bukan cuma slide. Tapi satu prototype biasanya makan waktu <span class="nb">2-3 bulan</span>.</p>
+          <p>Jadi aku bangun kerangka yang bisa dipakai ulang: karakter, kontrol, pertarungan, efek, dan level. Hasilnya, satu prototype selesai dalam 1 hari. Game kedua yang memakai kerangka yang sama selesai dalam kurang dari 12 jam.</p>
+        </div>
+        <div class="card compare" aria-label="Perbandingan waktu membuat prototype">
+          <div class="row"><span>Dulu</span><div class="track"><i class="fill old" style="--w:100%"></i></div><b>2-3 bulan</b></div>
+          <div class="row"><span>Sekarang</span><div class="track"><i class="fill new" style="--w:5%"></i></div><b>1 hari</b></div>
+          <div class="row"><span>Game kedua</span><div class="track"><i class="fill new2" style="--w:2.5%"></i></div><b>&lt; 12 jam</b></div>
+          <p class="note">Panjang batang hanya ilustrasi perbandingan.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+      <div class="cta-card">
+        <p class="chip chip-dark">SIAP?</p>
+        <h2>Satu klik, langsung main.</h2>
+        <p>Tidak perlu akun, tidak perlu unduh. Siapkan keyboard atau buka dari HP.</p>
+        <div class="cta-row center">
+          <a class="btn" href="https://ultraman-nine-trials.pages.dev/" target="_blank" rel="noopener">▶ Main sekarang</a>
+          <a class="btn btn-ghost" href="https://github.com/shafry00/tokusatsu-brawler" target="_blank" rel="noopener">Kode di GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><b>Tokusatsu Brawler</b> dibuat oleh Shafry Yusuf Al Juni.</p>
+    <p class="legal">Proyek fan tidak resmi. Tidak berafiliasi, didukung, atau dilisensikan oleh Tsuburaya Productions. Nama dan karakter yang muncul di game adalah merek dagang pemiliknya masing-masing. Tampilan di halaman ini adalah cuplikan layar dari game itu sendiri.</p>
+  </footer>
+
+  <script src="js/main.js" defer></script>
+</body>
+</html>
