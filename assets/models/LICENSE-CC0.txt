@@ -1,0 +1,42 @@
+ASSET LICENCES — assets/models/
+================================
+
+Every model in this folder is released under CC0 1.0 Universal
+(public domain dedication).  https://creativecommons.org/publicdomain/zero/1.0/
+
+You may copy, modify, distribute and use them commercially, without
+attribution.  Attribution is given below anyway, because the authors earned it.
+
+Files
+-----
+hero.glb                  Universal Base Characters      · Quaternius
+anim-ual.glb              Universal Animation Library    · Quaternius
+kaiju-frog.glb            creature pack                  · Quaternius / KayKit
+kaiju-mushroom.glb        creature pack                  · Quaternius / KayKit
+kaiju-orc.glb             creature pack                  · Quaternius / KayKit
+kaiju-bluedemon.glb       creature pack                  · Quaternius / KayKit
+kaiju-bull.glb            Animated Animals               · Quaternius
+kaiju-squid.glb           creature pack                  · Quaternius
+kaiju-tribal.glb          creature pack                  · Quaternius
+kaiju-demon.glb           creature pack                  · Quaternius
+kaiju-dragon.glb          creature pack                  · Quaternius
+kaiju-skeleton.glb        Skeleton Character Pack        · KayKit (Kay Lousberg)
+
+Authors
+-------
+Quaternius           https://quaternius.com
+                     CC0 1.0
+KayKit / Kay Lousberg https://kaylousberg.com  ·  https://kaykit.itch.io
+                     CC0 1.0
+
+Mirror these exact bytes were fetched from
+------------------------------------------
+https://github.com/Dallolz/moorfall-assets
+  characters/Superhero_Male.glb
+  animations/UAL1.glb
+  enemies/{Frog,Orc,Dragon_Evolved,Blue_Demon,Squidle,Bull,
+           Skeleton_Warrior,Tribal,Demon,Mushroom_King}.glb
+
+The files are stored here unmodified.  All character colouring, height
+normalisation and animation retiming happens at runtime in js/models.js; no
+asset is edited on disk.

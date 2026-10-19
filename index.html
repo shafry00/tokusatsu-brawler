@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>ULTRAMAN — Nine Trials</title>
+<link rel="stylesheet" href="css/style.css?v=3" />
+</head>
+<body>
+
+<div id="app">
+  <canvas id="gl"></canvas>
+
+  <!-- ======================= HUD ======================= -->
+  <div id="hud" class="hidden">
+    <!-- top left: vitals -->
+    <div class="hud-tl">
+      <div class="hero-card">
+        <img id="heroPortrait" alt="" />
+        <div class="hero-info">
+          <div class="hero-name">ULTRAMAN</div>
+          <div class="bar bar-hp">
+            <div class="bar-fill" id="hpFill"></div>
+            <div class="bar-ghost" id="hpGhost"></div>
+            <span class="bar-label" id="hpText">100 / 100</span>
+          </div>
+          <div class="bar bar-en">
+            <div class="bar-fill" id="enFill"></div>
+            <span class="bar-label" id="enText">ENERGY</span>
+          </div>
+        </div>
+        <div class="timer" id="colorTimer" title="Color Timer">
+          <div class="timer-core"></div>
+        </div>
+      </div>
+      <div class="ultra-clock">
+        <span class="uc-label">ULTRA TIME</span>
+        <span class="uc-time" id="ultraTime">3:00</span>
+      </div>
+    </div>
+
+    <!-- top right: level + score -->
+    <div class="hud-tr">
+      <div class="stage-label">STAGE <span id="stageNum">1</span> / 9</div>
+      <div class="stage-name" id="stageName">TOKYO RAMPAGE</div>
+      <div class="obj" id="objective">Defeat all kaiju</div>
+      <div class="score-row">
+        <span class="score" id="score">0</span>
+        <span class="score-cap">SCORE</span>
+      </div>
+      <div class="wave-row" id="waveRow"></div>
+    </div>
+
+    <!-- combo -->
+    <div class="combo hidden" id="combo">
+      <span id="comboNum">0</span><span class="combo-x">HIT</span>
+      <div class="combo-rank" id="comboRank"></div>
+    </div>
+
+    <!-- hints -->
+    <div class="hint" id="hint"></div>
+
+    <!-- boss bar -->
+    <div class="bossbar hidden" id="bossbar">
+      <div class="boss-name" id="bossName">ZETTON</div>
+      <div class="boss-hp"><div class="boss-hp-fill" id="bossFill"></div></div>
+      <div class="boss-phase" id="bossPhase"></div>
+    </div>
+
+    <!-- finisher prompt -->
+    <div class="finisher hidden" id="finisher">
+      <div class="fin-key">F</div>
+      <div class="fin-text">FINISH</div>
+    </div>
+
+    <!-- action bar -->
+    <div class="actionbar">
+      <div class="act" data-k="J"><b>J</b>LIGHT</div>
+      <div class="act" data-k="K"><b>K</b>HEAVY</div>
+      <div class="act" data-k="U"><b>U</b>SPECIUM</div>
+      <div class="act" data-k="I"><b>I</b>SLASH</div>
+      <div class="act" data-k="Q"><b>Q</b>DASH</div>
+      <div class="act" data-k="Space"><b>SPC</b>FLY</div>
+    </div>
+
+    <div class="dbg" id="dbg"></div>
+  </div>
+
+  <!-- ======================= TITLE ======================= -->
+  <div id="title" class="screen">
+    <div class="title-bg"></div>
+    <div class="title-art" id="titleArt"></div>
+    <div class="title-inner">
+      <div class="logo">
+        <div class="logo-sub">TSUBURAYA · FAN EXPERIENCE</div>
+        <h1>ULTRA<span>MAN</span></h1>
+        <div class="logo-tag">NINE TRIALS &nbsp;·&nbsp; 9 STAGES &nbsp;·&nbsp; FINAL BOSS</div>
+      </div>
+      <div class="menu">
+        <button class="btn primary" id="btnStart">START ADVENTURE</button>
+        <button class="btn" id="btnLevels">STAGE SELECT</button>
+        <button class="btn" id="btnControls">CONTROLS</button>
+      </div>
+      <div class="title-foot">
+        <p class="disclaimer">
+          Unofficial fan-made project. Not affiliated with, endorsed by, or licensed by
+          Tsuburaya Productions. ULTRAMAN and related characters are trademarks of
+          Tsuburaya Productions Co., Ltd.
+        </p>
+        <p class="hintline">Tip: hold <b>Space</b> in the air to take flight, <b>Shift</b> to dive — you're Ultraman.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= STAGE SELECT ======================= -->
+  <div id="levelselect" class="screen hidden">
+    <div class="panel wide">
+      <h2>STAGE SELECT</h2>
+      <div class="stages" id="stageGrid"></div>
+      <div class="panel-foot"><button class="btn" id="btnLsBack">BACK</button></div>
+    </div>
+  </div>
+
+  <!-- ======================= CONTROLS ======================= -->
+  <div id="controls" class="screen hidden">
+    <div class="panel">
+      <h2>CONTROLS</h2>
+      <div class="ctrl-grid">
+        <div class="ctrl"><b>W A S D</b><span>Move</span></div>
+        <div class="ctrl"><b>MOUSE</b><span>Look / aim</span></div>
+        <div class="ctrl"><b>SHIFT</b><span>Sprint · hold in air to DIVE</span></div>
+        <div class="ctrl"><b>SPACE</b><span>Jump · hold in air to FLY (release to sink)</span></div>
+        <div class="ctrl"><b>J / Left click</b><span>Light attack — 3-hit combo</span></div>
+        <div class="ctrl"><b>K / Right click</b><span>Heavy strike — breaks guard</span></div>
+        <div class="ctrl"><b>U</b><span>Specium Ray — costs 40 energy</span></div>
+        <div class="ctrl"><b>I</b><span>Ultra Slash — piercing ring</span></div>
+        <div class="ctrl"><b>Q</b><span>Dash — invincible frames</span></div>
+        <div class="ctrl"><b>F</b><span>Finisher (when prompted)</span></div>
+        <div class="ctrl"><b>C</b><span>Lock-on / release camera</span></div>
+        <div class="ctrl"><b>G</b><span>Summon an Ultra ally (once per stage)</span></div>
+        <div class="ctrl"><b>M</b><span>Mute / unmute</span></div>
+        <div class="ctrl"><b>ESC</b><span>Pause</span></div>
+      </div>
+      <p class="note">Chain light hits to raise the combo meter — higher combos build Ultra Energy faster and score more.
+      Watch the <b>Ultra Timer</b>: when it hits zero your power drains and damage taken doubles.</p>
+      <div class="panel-foot"><button class="btn" id="btnCtrlBack">BACK</button></div>
+    </div>
+  </div>
+
+  <!-- ======================= PAUSE ======================= -->
+  <div id="pause" class="screen hidden">
+    <div class="panel">
+      <h2>PAUSED</h2>
+      <div class="menu">
+        <button class="btn primary" id="btnResume">RESUME</button>
+        <button class="btn" id="btnRestart">RESTART STAGE</button>
+        <button class="btn" id="btnQuit">QUIT TO TITLE</button>
+      </div>
+      <div class="panel-foot small" id="pauseStats"></div>
+    </div>
+  </div>
+
+  <!-- ======================= STAGE CLEAR ======================= -->
+  <div id="clear" class="screen hidden">
+    <div class="panel">
+      <div class="clear-badge">STAGE CLEAR</div>
+      <h2 id="clearTitle">TOKYO RAMPAGE</h2>
+      <div class="stats" id="clearStats"></div>
+      <div class="upgrade">
+        <div class="up-title">CHOOSE A POWER-UP</div>
+        <div class="up-grid" id="upGrid"></div>
+      </div>
+      <div class="panel-foot"><button class="btn primary" id="btnNext">NEXT STAGE</button></div>
+    </div>
+  </div>
+
+  <!-- ======================= GAME OVER ======================= -->
+  <div id="gameover" class="screen hidden">
+    <div class="panel">
+      <h2 class="danger" id="goTitle">COLOR TIMER — OUT</h2>
+      <p class="note" id="goNote">The light fades… but Ultraman never truly falls.</p>
+      <div class="stats" id="goStats"></div>
+      <div class="panel-foot">
+        <button class="btn primary" id="btnRetry">RETRY STAGE</button>
+        <button class="btn" id="btnGoTitle">TITLE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= VICTORY ======================= -->
+  <div id="victory" class="screen hidden">
+    <div class="panel">
+      <div class="clear-badge gold">ALL TRIALS CLEARED</div>
+      <h2>PEACE RETURNS TO EARTH</h2>
+      <div class="stats" id="vicStats"></div>
+      <div class="panel-foot">
+        <button class="btn primary" id="btnVicLevels">STAGE SELECT</button>
+        <button class="btn" id="btnVicTitle">TITLE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= TOAST ======================= -->
+  <div id="toast" class="hidden">
+    <div class="toast-stage" id="toastStage">STAGE 1</div>
+    <div class="toast-name" id="toastName">TOKYO RAMPAGE</div>
+    <div class="toast-sub" id="toastSub"></div>
+  </div>
+
+  <div id="flash"></div>
+  <div id="loading"><div class="spin"></div><div class="load-text">LOADING…</div></div>
+</div>
+
+<script src="js/three.min.js"></script>
+<script src="js/lib/GLTFLoader.js"></script>
+<script src="js/lib/SkeletonUtils.js"></script>
+<script src="js/audio.js?v=3"></script>
+<script src="js/fx.js?v=3"></script>
+<script src="js/sprites.js?v=3"></script>
+<script src="js/models.js?v=3"></script>
+<script src="js/world.js?v=3"></script>
+<script src="js/enemies.js?v=3"></script>
+<script src="js/player.js?v=3"></script>
+<script src="js/game.js?v=3"></script>
+</body>
+</html>

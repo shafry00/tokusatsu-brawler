@@ -1,0 +1,21 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# editor / tooling
+.vscode/
+.idea/
+*.swp
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# pipeline scratch
+tools/out/
+tools/models/*
+!tools/models/.gitkeep
+
+# drop your own models in assets/models/ freely, but keep the CC0 pack tracked
+# (if you swap the example pack for something you cannot redistribute, add
+#  something like `assets/models/kaiju-*.glb` here and `git rm --cached` it)
