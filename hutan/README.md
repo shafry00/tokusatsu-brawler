@@ -122,7 +122,11 @@ JagaHutan.debug.spawnBoss()
 JagaHutan.debug.planters.spawnWave(4)
 JagaHutan.debug.nextStage()
 JagaHutan.debug.heli.reset(3)
+JagaHutan.debug.frame()          // render + step one frame by hand
 ```
+
+`frame()` exists because a backgrounded tab stops `requestAnimationFrame`: a loop that
+calls it for N ms advances the sim by N seconds, which is how the captures were taken.
 
 `/hutan/?shot=hud|fire|boss` auto-starts a stage and frames a scene; used for capturing
 screenshots and for eyeballing balance without playing to the boss.

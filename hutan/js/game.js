@@ -357,8 +357,9 @@
       player.actor.setState({ speed: 0 });
     }
     player.setWeapon("hose");
-    player.yaw = Math.PI;
-    cam.yaw = Math.PI;
+    /* spawn facing the treeline, outpost over the left shoulder */
+    player.yaw = Math.PI * 0.58;
+    cam.yaw = Math.PI * 0.58;
     cam.pitch = -0.42;
     cam.init = false;
 
