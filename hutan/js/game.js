@@ -947,6 +947,9 @@
       spawnBoss: function () { if (!boss) spawnBoss(); },
       nextStage: function () { startStage(Math.min(STAGES.length - 1, G.stageIdx + 1)); },
       addScore: addScore,
+      /* drive one frame by hand: useful when the tab is backgrounded
+         (rAF stops) and for offline captures */
+      frame: frame,
       clear: stageClear,
       hurt: function (n) { player.damage(n, null); }
     },

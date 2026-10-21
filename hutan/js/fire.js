@@ -243,6 +243,25 @@
     }
   };
 
+  /* a big flame licking off a moving body: larger and denser than a tree */
+  FireFX.bossFlame = function (x, y, z, n, dt) {
+    let k = n * dt;
+    const f = FireFX.fire;
+    while (k > 0) {
+      if (k < 1 && Math.random() > k) break;
+      k -= 1;
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.random() * 0.85;
+      f.spawn(
+        x + Math.cos(a) * r, y + Math.random() * 1.8, z + Math.sin(a) * r,
+        (Math.random() - 0.5) * 2.2, 2.4 + Math.random() * 3.4, (Math.random() - 0.5) * 2.2,
+        1.0, 0.42 + Math.random() * 0.3, 0.06,
+        1.4 + Math.random() * 1.7, 0.45 + Math.random() * 0.6,
+        -1.0, 0.9
+      );
+    }
+  };
+
   /* a single water droplet from the hose / a splash */
   FireFX.drop = function (x, y, z, vx, vy, vz, size) {
     FireFX.water.spawn(

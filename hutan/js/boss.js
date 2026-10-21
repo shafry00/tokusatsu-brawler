@@ -92,8 +92,8 @@
       if (window.Wowok && Wowok.has("boss")) {
         a = Wowok.create({
           kind: "boss", height: this.height,
-          tint: 0xc2471c, glow: 0.42,
-          droop: 0.46, aura: 0xff5210
+          tint: 0x5e2410, glowColor: 0xff5316, glow: 0.2,
+          droop: 0.62, aura: 0xff5210
         });
         a.isWowok = true;
       }
@@ -130,23 +130,15 @@
     this.scene.add(this.group);
     this.group.position.copy(this.pos);
 
-    this.shadow = new THREE.Mesh(new THREE.CircleGeometry(this.radius * 1.5, 20), window.BlobShadow.mat(0.55));
+    this.shadow = new THREE.Mesh(new THREE.CircleGeometry(this.radius * 1.35, 20), window.BlobShadow.mat(0.62));
     this.shadow.rotation.x = -Math.PI / 2;
-    this.shadow.position.set(this.pos.x, 0.05, this.pos.z);
+    this.shadow.position.set(this.pos.x, 0.09, this.pos.z);
     this.scene.add(this.shadow);
     this.height = this.actor ? this.height : 14;
 
-    this.light = new THREE.PointLight(0xff5a18, 2.4, 90, 2);
+    this.light = new THREE.PointLight(0xff6a24, 1.05, 18, 2);
     this.light.position.set(this.pos.x, this.height * 0.6, this.pos.z);
     this.scene.add(this.light);
-
-    /* a personal smog cloud */
-    this.smog = new THREE.Mesh(
-      new THREE.SphereGeometry(this.height * 0.55, 12, 8),
-      new THREE.MeshBasicMaterial({ color: 0x2a0d04, transparent: true, opacity: 0.1, depthWrite: false })
-    );
-    this.smog.position.y = this.height * 0.5;
-    this.group.add(this.smog);
 
     /* two hot points where the face is — the scan has no rig, so the
        "gaze" is a pair of additive sprites that track the head */
@@ -299,19 +291,16 @@
        of the mesh (particles spawned inside the body are depth-culled) */
     if (!this.doused && !this.dying) {
       const h = this.height;
-      const rr = h * 0.11;
-      for (let i = 0; i < 3; i++) {
-        if (Math.random() > dt * 20) continue;
-        const a = Math.random() * Math.PI * 2;
-        FireFX.treeFlame(
-          this.pos.x + Math.cos(a) * rr,
-          h * (0.22 + Math.random() * 0.62),
-          this.pos.z + Math.sin(a) * rr,
-          0.34, dt
-        );
-      }
-      if (Math.random() < dt * 7) {
-        FireFX.groundFlame(this.pos.x, this.pos.z, this.radius * 0.85, dt);
+      const rr = h * 0.075;
+      const swing = Math.sin(performance.now() * 0.004);
+      FireFX.bossFlame(this.pos.x + rr * swing, h * 0.52, this.pos.z + rr * 0.6, 22, dt);
+      FireFX.bossFlame(this.pos.x - rr, h * 0.74, this.pos.z - rr * 0.4, 16, dt);
+      FireFX.bossFlame(this.pos.x + rr, h * 0.76, this.pos.z + rr * 0.5, 16, dt);
+      FireFX.bossFlame(this.pos.x, h * 0.9, this.pos.z, 8, dt);
+      FireFX.bossFlame(this.pos.x - rr * 0.5, h * 0.16, this.pos.z, 9, dt);
+      FireFX.bossFlame(this.pos.x + rr * 0.5, h * 0.2, this.pos.z + rr * 0.4, 9, dt);
+      if (Math.random() < dt * 9) {
+        FireFX.groundFlame(this.pos.x, this.pos.z, this.radius * 0.9, dt);
       }
     }
 
@@ -453,7 +442,7 @@
           const t = forest.healthySpot(this.pos.x, this.pos.z);
           if (t) {
             forest.ignite(t, 0.5);
-            FireFX.burst(new THREE.Vector3(t.x, t.h * 0.6, t.z), 0xff8a2c, 10, { speed: 9, life: 0.7, size: 1.6 });
+            FX.burst(new THREE.Vector3(t.x, t.h * 0.6, t.z), 0xff8a2c, 10, { speed: 9, life: 0.7, size: 1.6 });
           }
         }
       }
@@ -500,7 +489,7 @@
       if (d < 24) this.yaw = Math.atan2(dx, dz);
     }
     this.group.position.set(this.pos.x, this.group.position.y, this.pos.z);
-    if (this.shadow) this.shadow.position.set(this.pos.x, 0.05, this.pos.z);
+    if (this.shadow) this.shadow.position.set(this.pos.x, 0.09, this.pos.z);
 
     /* shove the player out of the furnace */
     const p = ctx.player;
@@ -646,7 +635,6 @@
     if (this.group) this.scene.remove(this.group);
     if (this.light) this.scene.remove(this.light);
     if (this.eyes) this.scene.remove(this.eyes);
-    if (this.smog) this.smog.visible = false;
   };
 
   Boss.prototype.cleanup = function () {

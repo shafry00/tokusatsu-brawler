@@ -90,6 +90,8 @@
     this.t = Math.random() * 6;
     this.flash = 0;
     this.baseTint = new THREE.Color(opt.tint === undefined ? 0xffffff : opt.tint);
+    this.glowColor = new THREE.Color(opt.glowColor === undefined
+      ? (opt.tint === undefined ? 0xffffff : opt.tint) : opt.glowColor);
     this.tintOn = !!opt.tint;
 
     this.uDroop = { value: opt.droop === undefined ? 1.0 : opt.droop };
@@ -109,7 +111,7 @@
            colour here is what makes a planter read amber and the
            boss read like a burning man */
         color: this.baseTint.clone(),
-        emissive: this.baseTint.clone(),
+        emissive: this.glowColor.clone(),
         emissiveMap: pack.tex,
         emissiveIntensity: this.glow0,
         side: THREE.DoubleSide
@@ -171,10 +173,11 @@
     this._flash = new THREE.Color();
   }
 
-  Actor.prototype.setTint = function (hex) {
+  Actor.prototype.setTint = function (hex, glow) {
     this.tintOn = true;
     this.baseTint.setHex(hex);
-    if (this.mat && this.mat.emissive) this.mat.emissive.copy(this.baseTint);
+    if (glow !== undefined) this.glowColor.setHex(glow);
+    if (this.mat && this.mat.emissive) this.mat.emissive.copy(this.glowColor);
   };
 
   Actor.prototype.setPos = function (x, y, z) {
@@ -267,7 +270,7 @@
         this.mat.emissiveIntensity = this.glow0 + k * 1.7;
       }
     } else if (this.mat && this.mat.emissive && this.tintOn) {
-      this.mat.emissive.copy(this.baseTint);
+      this.mat.emissive.copy(this.glowColor);
       this.mat.emissiveIntensity = this.glow0;
     }
 
