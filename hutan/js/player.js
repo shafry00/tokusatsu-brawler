@@ -192,6 +192,7 @@
     this.water = TUNE.maxWater;
     this.maxWater = TUNE.maxWater;
     this.grounded = true;
+    this.god = false;
     this.dead = false;
     this.deadT = 0;
     this.hurtT = 0;
@@ -341,6 +342,11 @@
   /* ---------------------------------------------------------- update */
   Player.prototype.update = function (dt, ctx) {
     const input = ctx.input;
+    if (this.god) {
+      /* mode dewa: the bar never drops and the tank never empties */
+      this.hp = this.maxHp;
+      this.water = this.maxWater;
+    }
     this.invuln = Math.max(0, this.invuln - dt);
     this.rollCd = Math.max(0, this.rollCd - dt);
     this.swingCd = Math.max(0, this.swingCd - dt);
@@ -755,7 +761,7 @@
 
   /* ---------------------------------------------------------- damage */
   Player.prototype.damage = function (amount, from) {
-    if (this.dead || this.invuln > 0) return false;
+    if (this.dead || this.invuln > 0 || this.god) return false;
     this.hp -= amount;
     this.hurtT = 0;
     this.invuln = 0.55;

@@ -35,13 +35,19 @@ wind, fire spread rate, fog and boss health. Lose when the plantation eats the f
 | `Shift` | Sprint |
 | `Space` | Jump |
 | `Q` | Roll (dodge, brief invulnerability) |
-| Left click | Use the tool in hand |
+| `J` | Use the tool in hand (hold to keep spraying / swinging) |
+| `F` | God mode — invincible, endless tank, endless heli |
 | `1` / `2` / `Tab` | Hose / hammer / swap |
 | `G` | Call the water-bombing helicopter |
 | `Esc` | Pause |
 | `M` | Mute |
 
-The tool wheel on the right is clickable, as are its `1` / `2` key badges.
+The tool wheel on the right is clickable, as are its `1` / `2` key badges. Every action is
+on the keyboard: the mouse only aims the camera and grabs pointer lock.
+
+**God mode** (`F`) is for checking the fire, the crew waves and the boss without dying: the
+health bar is pinned, the tank never empties and the radio always has three calls left. The
+amber `∞ MODE DEWA` chip under the water bar shows it is on; `F` again turns it off.
 
 ## How the fight reads
 

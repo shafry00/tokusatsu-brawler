@@ -71,6 +71,7 @@
     clearT: 0,
     overT: 0,
     muted: false,
+    god: false,
     difficulty: "normal",
     startStageIdx: 0,
     dmgMul: 0.82,
@@ -184,6 +185,7 @@
       } catch (e) {}
 
       player = new Player(scene, {});
+      player.god = G.god;
       bindPlayerEvents();
 
       forest.build(STAGES[0]);
@@ -491,6 +493,14 @@
         Hud.toast(G.muted ? "SUARA DIMATIKAN" : "SUARA DINYALAKAN", "", 1200);
         return;
       }
+      if (e.code === "KeyF") {
+        G.god = !G.god;
+        if (player) player.god = G.god;
+        if (window.Hud && Hud.god) Hud.god(G.god);
+        Hud.toast(G.god ? "MODE DEWA · TAK TERKALAHKAN" : "MODE DEWA MATI",
+          G.god ? "ember" : "", 1600);
+        return;
+      }
 
       if (G.state !== "playing") return;
 
@@ -514,17 +524,11 @@
 
     const canvas = renderer.domElement;
 
+    /* the mouse is for looking only: every action is on the keyboard */
     canvas.addEventListener("mousedown", function (e) {
-      if (G.state === "playing") {
-        if (e.button === 0) input.fire = true;
-        if (!document.pointerLockElement) {
-          try { canvas.requestPointerLock(); } catch (err) {}
-        }
+      if (G.state === "playing" && !document.pointerLockElement) {
+        try { canvas.requestPointerLock(); } catch (err) {}
       }
-    });
-
-    window.addEventListener("mouseup", function (e) {
-      if (e.button === 0) input.fire = false;
     });
 
     canvas.addEventListener("contextmenu", function (e) { e.preventDefault(); });
@@ -699,6 +703,8 @@
     input.left = !!(keys.KeyA || keys.ArrowLeft);
     input.right = !!(keys.KeyD || keys.ArrowRight);
     input.sprint = !!(keys.ShiftLeft || keys.ShiftRight);
+    /* J is the action button: hold to spray, hold to keep swinging */
+    input.fire = !!keys.KeyJ;
 
     const ctx = {
       camera: camera,
@@ -719,6 +725,11 @@
     }
 
     player.update(dt, ctx);
+
+    if (G.god) {
+      /* unlimited: water and heli calls never run out */
+      if (heli.charges < 3) heli.charges = 3;
+    }
 
     if (boss) boss.update(dt, ctx);
     planters.update(dt, ctx);

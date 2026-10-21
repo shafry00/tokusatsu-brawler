@@ -96,6 +96,26 @@ html, body {
   opacity: .8;
 }
 
+/* god mode badge: sits under the water bar, only when F is on */
+.godchip {
+  display: none;
+  margin-top: 7px;
+  padding: 2px 7px 3px;
+  width: max-content;
+  color: #1b1206;
+  background: #e8b34a;
+  border-radius: 2px;
+  font-size: 8px; font-weight: 700; letter-spacing: .18em;
+  box-shadow: 0 0 12px rgba(232, 179, 74, .45);
+  animation: godpulse 1.6s ease-in-out infinite;
+}
+.godchip.on { display: block; }
+
+@keyframes godpulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+
 .hp-row { display: flex; align-items: center; gap: 10px; }
 
 .hpbar {

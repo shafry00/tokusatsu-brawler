@@ -32,7 +32,7 @@
 
   Hud.init = function () {
     ["hud", "hpFill", "hpText", "hpMax", "waterFill", "waterText",
-      "hint", "stageNum", "stageTotal", "stageName", "forestFill", "forestPct",
+      "hint", "godChip", "stageNum", "stageTotal", "stageName", "forestFill", "forestPct",
       "sawitFill", "sawitPct", "score", "clock", "boss", "bossName", "bossSub",
       "bossFill", "bossSoak", "banner", "toast", "hurt", "minimap", "crosshair",
       "compass", "wheel", "wheelName", "wheelAmmo", "segHose", "segHammer",
@@ -107,6 +107,14 @@
     t.textContent = text;
     t.className = "toast show" + (kind ? " " + kind : "");
     Hud._toastT = (ms || 1800) / 1000;
+  };
+
+  /* persistent little badge while F is on */
+  Hud.god = function (on) {
+    const c = Hud.el.godChip;
+    if (!c) return;
+    c.classList.toggle("on", !!on);
+    c.setAttribute("aria-hidden", on ? "false" : "true");
   };
 
   Hud.hurt = function () {
