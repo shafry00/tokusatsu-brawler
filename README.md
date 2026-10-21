@@ -47,6 +47,21 @@ by placing parts, and the result ships with no uploads and no asset ids. See
 [`docs/ROBLOX.md`](docs/ROBLOX.md) for the reasoning and [`roblox/README.md`](roblox/README.md)
 to run it.
 
+## JAGA HUTAN — a second game
+
+[`hutan/`](hutan/README.md) is a smaller game built on the same engine files and model
+pack: a third-person forest-fire defence where a burning giant walks the canopy line, an
+oil-palm crew plants the ashes, and you fight back with a hose, a sledgehammer and a
+water-bombing helicopter.
+
+```bash
+open http://localhost:8777/hutan/
+```
+
+It has its own HUD, a gold arc main menu, three stages and a difficulty setting. The
+characters are two unrigged photogrammetry scans (`wowok`) animated by a vertex-shader
+arm droop rather than a skeleton — see [`hutan/README.md`](hutan/README.md).
+
 ## Quickstart
 
 ```bash

@@ -77,3 +77,10 @@ The build this engine was originally written for pairs the Universal Rig with a 
 mesh built from a fan-made statue kit that is licensed for study and personal exchange
 only. **That mesh is deliberately not in this repository.** The CC0 mannequin stands in
 for it, and `docs/ASSET-PIPELINE.md` explains how to drop your own hero in instead.
+
+## JAGA HUTAN (hutan/)
+
+The forest-fire game reuses the engine and the CC0 pack. Two additional character scans
+(`assets/models/wowok.glb`, `assets/models/wowok-boss.glb`) were supplied by the project
+owner and are excluded from the CC0 licensing of the rest of the pack; verify their
+licence before redistributing.

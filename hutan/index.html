@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta http-equiv="cache-control" content="no-store">
+<meta http-equiv="pragma" content="no-cache">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>JAGA HUTAN — Operasi Hujan Buatan</title>
+<link rel="stylesheet" href="css/style.css?v=18" />
+</head>
+<body>
+
+<div id="app">
+  <canvas id="gl"></canvas>
+
+  <!-- ======================= HUD ======================= -->
+  <div id="hud" class="hidden">
+
+    <!-- ---------- top left: the ranger ---------- -->
+    <div class="vitals">
+      <div class="who">
+        <span class="badge">R1</span>
+        <span class="callsign">RANGER <b>01</b></span>
+        <span class="obj-tag">HUTAN TIGAPULUH</span>
+      </div>
+
+      <div class="hp-row">
+        <div class="hpbar" id="hpBar">
+          <div class="hpfill" id="hpFill"></div>
+          <i class="tick" style="left:12.5%"></i><i class="tick" style="left:25%"></i>
+          <i class="tick" style="left:37.5%"></i><i class="tick" style="left:50%"></i>
+          <i class="tick" style="left:62.5%"></i><i class="tick" style="left:75%"></i>
+          <i class="tick" style="left:87.5%"></i>
+        </div>
+        <div class="hpnum"><b id="hpText">100</b><span>/</span><span id="hpMax">100</span></div>
+      </div>
+
+      <div class="water">
+        <div class="water-track"><div id="waterFill"></div></div>
+        <span class="water-lbl" id="waterText">AIR 100</span>
+      </div>
+
+      <div class="obj" id="hint">klik kiri semprot · 2 palu · G heli</div>
+    </div>
+
+    <!-- ---------- top centre: compass ---------- -->
+    <canvas id="compass" width="800" height="64"></canvas>
+
+    <!-- ---------- top right: the forest ---------- -->
+    <div class="meters">
+      <div class="stage">
+        <span class="tno">TAHAP <b id="stageNum">1</b><i>/</i><span id="stageTotal">3</span></span>
+        <span class="tname" id="stageName">TAMAN NASIONAL</span>
+      </div>
+      <div class="mrow">
+        <svg class="mi" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M10 2 L14 8 H11.6 L15.4 14 H4.6 L8.4 8 H6 Z" />
+          <rect x="9.2" y="13" width="1.6" height="5" />
+        </svg>
+        <div class="mtrack"><div id="forestFill"></div></div>
+        <b id="forestPct">100%</b>
+      </div>
+      <div class="mrow saw">
+        <svg class="mi" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M10 18 V9" />
+          <path d="M10 9 C6 9 4 6 3 3 C7 3 10 5 10 9 Z" />
+          <path d="M10 9 C14 9 16 6 17 3 C13 3 10 5 10 9 Z" />
+          <path d="M10 13 C7 13 5 11 4 9 C7.5 9 10 10.5 10 13 Z" />
+          <path d="M10 13 C13 13 15 11 16 9 C12.5 9 10 10.5 10 13 Z" />
+        </svg>
+        <div class="mtrack"><div id="sawitFill"></div></div>
+        <b id="sawitPct">0%</b>
+      </div>
+      <div class="scoreline">
+        <b id="score">0</b><span>SKOR</span><i></i><span class="clock" id="clock">0:00</span>
+      </div>
+    </div>
+
+    <!-- ---------- right: the tool wheel ---------- -->
+    <div class="wheel" id="wheel">
+      <svg class="wheel-svg" viewBox="0 0 160 160" aria-hidden="true">
+        <circle class="wfill" cx="80" cy="80" r="50" />
+        <circle class="wtrack" cx="80" cy="80" r="61" />
+        <circle class="wseg" id="segHose" data-w="hose" cx="80" cy="80" r="61"
+                transform="rotate(183 80 80)" stroke-dasharray="152 231" />
+        <circle class="wseg" id="segHammer" data-w="hammer" cx="80" cy="80" r="61"
+                transform="rotate(3 80 80)" stroke-dasharray="152 231" />
+      </svg>
+
+      <div class="whub">
+        <span class="wname" id="wheelName">SELANG</span>
+        <b class="wammo" id="wheelAmmo">110</b>
+        <em class="wunit">AIR</em>
+      </div>
+
+      <button class="wkey top" id="labHose" data-w="hose" type="button" title="Selang (1)">1</button>
+      <button class="wkey bot" id="labHammer" data-w="hammer" type="button" title="Palu (2)">2</button>
+
+      <div class="wheli">
+        <svg class="hi" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2 5 H22" /><path d="M12 5 V9" /><path d="M5 9 H19 L17 14 H7 Z" />
+          <path d="M9 18 H15" /><path d="M12 14 V18" />
+        </svg>
+        <span class="hpips" id="heliRow"></span>
+        <b id="heliText">3</b>
+        <span class="hlabel">HELI</span>
+      </div>
+    </div>
+
+    <!-- ---------- bottom left: field chips ---------- -->
+    <div class="chips">
+      <div class="chip">
+        <svg class="ci fire" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2 C15 7 19 8 19 14 A7 7 0 0 1 5 14 C5 10 8 8 9 4 C10 7 12 8 12 10 C13.5 7 13 4 12 2 Z" />
+        </svg>
+        <b id="fireCount">0</b>
+        <em>API</em>
+      </div>
+      <div class="chip">
+        <svg class="ci palm" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 22 V11" />
+          <path d="M12 11 C8 11 5.5 8 4.5 4 C9 4 12 6.5 12 11 Z" />
+          <path d="M12 11 C16 11 18.5 8 19.5 4 C15 4 12 6.5 12 11 Z" />
+          <path d="M12 15 C9 15 6.5 13 5.5 10 C9.5 10 12 11.8 12 15 Z" />
+          <path d="M12 15 C15 15 17.5 13 18.5 10 C14.5 10 12 11.8 12 15 Z" />
+        </svg>
+        <b id="sawitCount">0</b>
+        <em>SAWIT</em>
+      </div>
+      <div class="chip">
+        <svg class="ci water" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3 C15 8 18 11 18 15 A6 6 0 0 1 6 15 C6 11 9 8 12 3 Z" />
+        </svg>
+        <b id="tankPct">100</b>
+        <em>AIR</em>
+      </div>
+    </div>
+
+    <!-- ---------- boss ---------- -->
+    <div class="boss hidden" id="boss">
+      <div class="boss-top">
+        <span class="bname" id="bossName">SANG BAKAR</span>
+        <span class="btag" id="bossTag">PENYEBAB KEBAKARAN</span>
+      </div>
+      <div class="boss-bar">
+        <div class="boss-main" id="bossFill"></div>
+        <div class="boss-soak" id="bossSoak"></div>
+      </div>
+      <div class="boss-sub" id="bossSub">SIRAM HINGGA PADAM, LALU HANTAM DENGAN PALU</div>
+    </div>
+
+    <!-- ---------- bottom right: radar ---------- -->
+    <canvas id="minimap" width="220" height="220"></canvas>
+
+    <div id="banner" class="banner"></div>
+    <div id="toast" class="toast"></div>
+    <div id="hurt" class="hurt"></div>
+    <div id="crosshair"><i></i></div>
+  </div>
+
+  <!-- ======================= LOADING ======================= -->
+  <div id="loading" class="screen">
+    <div class="wrap load-wrap">
+      <div class="kicker">MEMUAT OPERASI</div>
+      <h1 class="logo">JAGA<br><em>HUTAN</em></h1>
+      <div class="loadbar"><div id="loadFill"></div></div>
+      <div class="loadtext" id="loadText">menyiapkan perlengkapan…</div>
+    </div>
+  </div>
+
+  <!-- ======================= TITLE / MENU ======================= -->
+  <div id="title" class="screen hidden">
+    <div class="veil"></div>
+
+    <div class="brand">
+      <div class="kicker">OPERASI HUJAN BUATAN · 2026</div>
+      <h1 class="logo">JAGA<br><em>HUTAN</em></h1>
+      <p class="brand-sub">Hutan gambut terbakar. Sawit menunggu tanah hangus.</p>
+      <div class="best" id="saveNote"></div>
+    </div>
+
+    <div class="menu">
+      <div class="arc">
+        <div class="arc-ring"></div>
+        <div class="arc-ring inner"></div>
+
+        <button class="arc-btn active" id="startBtn" data-tab="mulai" type="button" title="Mulai operasi">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 L20 12 L7 20 Z" /></svg>
+          <span>MULAI</span>
+        </button>
+
+        <button class="arc-btn" data-tab="tahap" type="button" title="Pilih tahap">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 19 H21" /><path d="M4 19 V13 L9 9 L14 13 V19" /><path d="M14 19 V10 L18 7 L21 9 V19" />
+          </svg>
+          <span>TAHAP</span>
+        </button>
+
+        <button class="arc-btn" data-tab="sulit" type="button" title="Kesulitan">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 L20 6 V12 C20 17 16 20 12 21 C8 20 4 17 4 12 V6 Z" /><path d="M12 8 V13" /><path d="M12 16 V16.4" />
+          </svg>
+          <span>KESULITAN</span>
+        </button>
+
+        <button class="arc-btn" data-tab="cara" type="button" title="Cara main">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.5" /><path d="M9.4 9.2 A2.7 2.7 0 0 1 14.6 10 C14.6 12 12 12.2 12 14" /><path d="M12 17 V17.4" />
+          </svg>
+          <span>CARA MAIN</span>
+        </button>
+
+        <button class="arc-btn danger" data-tab="keluar" type="button" title="Keluar">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 4 H5 V20 H10" /><path d="M15 8 L20 12 L15 16" /><path d="M20 12 H9" />
+          </svg>
+          <span>KELUAR</span>
+        </button>
+      </div>
+
+      <div class="panel" id="menuPanel">
+        <!-- mulai -->
+        <section class="pane active" data-pane="mulai">
+          <div class="pane-head">
+            <span class="pane-no">01</span>
+            <h2>Briefing</h2>
+            <span class="pane-rule"></span>
+          </div>
+          <p class="brief">
+            <b>Sang Bakar</b> berjalan dari pohon ke pohon. Setiap hektar yang hangus
+            memanggil <b>pasukan sawit</b> untuk menanam baris demi baris.
+          </p>
+          <ul class="brief-list">
+            <li><b>Selang</b> — padamkan api, basahi Sang Bakar, tembak bola api.</li>
+            <li><b>Palu</b> — habisi pasukan sawit; hantam Sang Bakar saat sudah basah.</li>
+            <li><b>Heli</b> — tiga kali hujan buatan per tahap.</li>
+            <li><b>Air</b> — isi ulang di kolam atau drum.</li>
+          </ul>
+          <div class="pane-foot">
+            <span>Tekan <b>MULAI</b> untuk berangkat.</span>
+            <kbd>ENTER</kbd>
+          </div>
+        </section>
+
+        <!-- tahap -->
+        <section class="pane" data-pane="tahap">
+          <div class="pane-head">
+            <span class="pane-no">02</span>
+            <h2>Pilih Tahap</h2>
+            <span class="pane-rule"></span>
+          </div>
+          <div class="opt-list" id="stageOpts">
+            <button class="opt on" data-stage="0" type="button">
+              <span class="dot"></span>
+              <span class="opt-name">TAMAN NASIONAL<i>Kabut pagi, api cepat menyebar.</i></span>
+              <span class="opt-val">01</span>
+            </button>
+            <button class="opt" data-stage="1" type="button">
+              <span class="dot"></span>
+              <span class="opt-name">HUTAN GAMBUT<i>Tanah hitam, asap tebal, sawit rakus.</i></span>
+              <span class="opt-val">02</span>
+            </button>
+            <button class="opt" data-stage="2" type="button">
+              <span class="dot"></span>
+              <span class="opt-name">HUTAN HUJAN<i>Hujan deras. Sang Bakar marah.</i></span>
+              <span class="opt-val">03</span>
+            </button>
+          </div>
+          <div class="pane-foot"><span>Mulai dari tahap yang dipilih.</span></div>
+        </section>
+
+        <!-- kesulitan -->
+        <section class="pane" data-pane="sulit">
+          <div class="pane-head">
+            <span class="pane-no">03</span>
+            <h2>Kesulitan</h2>
+            <span class="pane-rule"></span>
+          </div>
+          <div class="opt-list" id="diffOpts">
+            <button class="opt" data-diff="santai" type="button">
+              <span class="dot"></span>
+              <span class="opt-name">SANTAI<i>Api lambat. Ranger lebih tahan.</i></span>
+              <span class="opt-val">01</span>
+            </button>
+            <button class="opt on" data-diff="normal" type="button">
+              <span class="dot"></span>
+              <span class="opt-name">NORMAL<i>Seimbang, sedikit berpihak ke ranger.</i></span>
+              <span class="opt-val">02</span>
+            </button>
+            <button class="opt" data-diff="nekat" type="button">
+              <span class="dot"></span>
+              <span class="opt-name">NEKAT<i>Api cepat, sawit banyak, satu nyawa.</i></span>
+              <span class="opt-val">03</span>
+            </button>
+          </div>
+          <div class="pane-foot"><span>Bisa diubah sebelum operasi dimulai.</span></div>
+        </section>
+
+        <!-- cara main -->
+        <section class="pane" data-pane="cara">
+          <div class="pane-head">
+            <span class="pane-no">04</span>
+            <h2>Kendali</h2>
+            <span class="pane-rule"></span>
+          </div>
+          <div class="keys">
+            <div><kbd>W A S D</kbd><span>bergerak</span></div>
+            <div><kbd>SPACE</kbd><span>lompat</span></div>
+            <div><kbd>SHIFT</kbd><span>lari</span></div>
+            <div><kbd>Q</kbd><span>gelinding</span></div>
+            <div><kbd>KLIK KIRI</kbd><span>pakai alat</span></div>
+            <div><kbd>1</kbd><kbd>2</kbd><kbd>TAB</kbd><span>ganti alat</span></div>
+            <div><kbd>G</kbd><span>panggil heli</span></div>
+            <div><kbd>ESC</kbd><span>jeda</span><kbd>M</kbd><span>bisu</span></div>
+          </div>
+        </section>
+
+        <!-- keluar -->
+        <section class="pane" data-pane="keluar">
+          <div class="pane-head">
+            <span class="pane-no">05</span>
+            <h2>Keluar</h2>
+            <span class="pane-rule"></span>
+          </div>
+          <p class="brief">Operasi bisa dimulai ulang kapan saja. Skor terbaik tetap tersimpan di perangkat ini.</p>
+          <div class="pane-foot">
+            <span>Tutup tab untuk keluar, atau</span>
+            <button class="btn small ghost" id="reloadBtn" type="button">MUAT ULANG</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="menu-hint">KLIK IKON · <kbd>ENTER</kbd> MULAI · <kbd>ESC</kbd> KEMBALI</div>
+  </div>
+
+  <!-- ======================= PAUSE ======================= -->
+  <div id="pause" class="screen hidden">
+    <div class="wrap">
+      <div class="kicker">OPERASI DIJEDA</div>
+      <h2 class="h2">Jeda</h2>
+      <p class="small" id="pauseStage">Taman Nasional</p>
+      <div class="title-actions">
+        <button id="resumeBtn" class="btn">LANJUT</button>
+        <button id="quitBtn" class="btn ghost">ULANGI TAHAP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= CLEAR ======================= -->
+  <div id="clear" class="screen hidden">
+    <div class="wrap">
+      <div class="kicker">TAHAP SELESAI</div>
+      <h2 class="h2 green">HUTAN AMAN</h2>
+      <div class="stats" id="clearStats"></div>
+      <div class="title-actions">
+        <button id="nextBtn" class="btn">TAHAP BERIKUTNYA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= GAME OVER ======================= -->
+  <div id="gameover" class="screen hidden">
+    <div class="wrap">
+      <div class="kicker">TAHAP GAGAL</div>
+      <h2 class="h2 ember">HUTAN JADI KEBUN SAWIT</h2>
+      <p class="pitch small" id="overText">
+        Terlalu banyak tanah hangus. Pasukan sawit masuk dan menanam baris demi baris.
+      </p>
+      <div class="stats" id="overStats"></div>
+      <div class="title-actions">
+        <button id="retryBtn" class="btn">ULANGI TAHAP</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="flash"></div>
+</div>
+
+<script src="../js/three.min.js"></script>
+<script>window.MODEL_BASE = "../assets/models/";</script>
+<script src="../js/lib/GLTFLoader.js"></script>
+<script src="../js/lib/SkeletonUtils.js"></script>
+<script src="../js/audio.js?v=18"></script>
+<script src="../js/fx.js?v=18"></script>
+<script src="../js/models.js?v=18"></script>
+<script src="js/wowok.js?v=18"></script>
+<script src="js/fire.js?v=18"></script>
+<script src="js/forest.js?v=18"></script>
+<script src="js/player.js?v=18"></script>
+<script src="js/boss.js?v=18"></script>
+<script src="js/planters.js?v=18"></script>
+<script src="js/heli.js?v=18"></script>
+<script src="js/hud.js?v=18"></script>
+<script src="js/game.js?v=18"></script>
+</body>
+</html>

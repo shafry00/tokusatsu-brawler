@@ -97,6 +97,15 @@
     levelup()    { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => osc("triangle", f, f, 0.22, 0.2), i * 110)); },
     lose()       { [440, 349, 261, 174].forEach((f, i) => setTimeout(() => osc("sawtooth", f, f * 0.9, 0.5, 0.22), i * 190)); },
     transform()  { osc("sine", 120, 1800, 1.1, 0.3); noise(1.1, 0.25, 400, 5000, 0.6, "highpass"); },
+    /* jaga-hutan additions: water, fire, rotors */
+    hose()       { noise(0.5, 0.26, 1100, 1700, 0.6, "highpass"); },
+    splash()     { noise(0.4, 0.3, 1400, 380, 0.9); osc("sine", 240, 120, 0.18, 0.12); },
+    steam()      { noise(0.7, 0.24, 3400, 1200, 0.8, "highpass"); },
+    ignite()     { noise(0.6, 0.4, 520, 110, 0.7, "lowpass"); osc("sawtooth", 130, 62, 0.5, 0.15); },
+    rotor()      { noise(1.2, 0.2, 190, 90, 0.5, "lowpass"); osc("sine", 60, 44, 1.1, 0.16); },
+    thud()       { osc("sine", 130, 44, 0.24, 0.42); noise(0.16, 0.34, 520, 130, 1.0); },
+    radio()      { osc("square", 1180, 1180, 0.07, 0.09); setTimeout(function () { osc("square", 1560, 1560, 0.08, 0.07); }, 120); },
+    bonk()       { osc("square", 300, 120, 0.16, 0.3); noise(0.12, 0.4, 900, 260, 1.4); },
   };
 
   A.sfx = function (name) {

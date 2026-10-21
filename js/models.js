@@ -36,7 +36,10 @@
    ============================================================ */
 (function () {
   const M = { ready: false, cache: {}, failed: {}, anims: null };
-  const BASE = "assets/models/";
+  /* Model folder, relative to the page.  The main game sits at the repo
+     root and uses the default; a second game in a subfolder sets
+     window.MODEL_BASE before this script loads.                      */
+  const BASE = (typeof window !== "undefined" && window.MODEL_BASE) || "assets/models/";
 
   /* -------- hero roles: one mesh, tinted/recoloured per character ------- */
   /* accent  = the red/blue/violet plates of the classic Ultra suits
