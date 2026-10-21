@@ -49,6 +49,23 @@
   }
 
   /* ---------------------------------------------------------- props */
+  /* parent a world-unit prop to a bone: bone space is rotated and
+     scaled by the rig, so the offset is rotated back and divided out */
+  function attachWorldProp(bone, worldOffset, prop, upright) {
+    bone.updateWorldMatrix(true, false);
+    const q = new THREE.Quaternion();
+    const s = new THREE.Vector3();
+    bone.matrixWorld.decompose(new THREE.Vector3(), q, s);
+    const qInv = q.clone().invert();
+    const slot = new THREE.Group();
+    slot.scale.set(1 / (s.x || 1), 1 / (s.y || 1), 1 / (s.z || 1));
+    slot.position.copy(worldOffset).applyQuaternion(qInv).divide(s);
+    if (upright) slot.quaternion.copy(qInv);
+    bone.add(slot);
+    slot.add(prop);
+    return slot;
+  }
+
   function attachToBone(actor, boneName, rot) {
     const bone = actor.root.getObjectByName(boneName);
     if (!bone) return null;
@@ -201,8 +218,14 @@
   Player.prototype._build = function (opts) {
     const scene = this.scene;
     let actor = null;
+    /* the ranger is an orangutan: ranger hat, water tank, hose */
     try {
-      if (window.Models && Models.cache && Models.cache.player) {
+      if (window.Orang && Orang.ready) actor = Orang.create({ height: TUNE.height });
+    } catch (e) {
+      console.warn("[player] orangutan failed", e);
+    }
+    try {
+      if (!actor && window.Models && Models.cache && Models.cache.player) {
         actor = Models.create("player", {
           height: TUNE.height,
           accent: 0xd6362c,
@@ -226,7 +249,12 @@
       const sc = actor.root.scale.x || 1;
       const head = actor.root.getObjectByName("Head");
       this.helmet = buildHelmet(this.height);
-      if (head) {
+      if (head && actor.isApe) {
+        /* the ape's skull sits above the head joint of the scan, and the
+           ranger hat is built for a much smaller head */
+        this.helmet.scale.setScalar(0.66);
+        attachWorldProp(head, new THREE.Vector3(0, 0.36, 0.1), this.helmet, true);
+      } else if (head) {
         const slot = new THREE.Group();
         slot.scale.setScalar(1 / sc);
         slot.position.set(0, 0.6 / sc, 0.04 / sc);
@@ -239,7 +267,12 @@
 
       this.tank = buildTank();
       const spine = actor.root.getObjectByName("spine_03");
-      if (spine) {
+      if (actor.isApe) {
+        /* the ape's back is a wide slope: keep the tank rigid to the body
+           and out of the fur, not to a single spine joint */
+        this.tank.position.set(0, this.height * 0.71, -this.height * 0.19);
+        actor.inner.add(this.tank);
+      } else if (spine) {
         const slot = new THREE.Group();
         slot.scale.setScalar(1 / sc);
         slot.position.set(0, 0.05 / sc, -0.5 / sc);

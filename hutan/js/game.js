@@ -163,8 +163,18 @@
     let progress = 0;
     Models.load(function (done, total) {
       progress = done / total;
-      Hud.loading(0.05 + progress * 0.85, done < total ? "memuat ranger…" : "menyiapkan hutan…");
+      Hud.loading(0.05 + progress * 0.8, done < total ? "memuat orangutan…" : "menyiapkan hutan…");
     }).then(function () {
+      /* the ranger himself */
+      if (window.Orang) {
+        Hud.loading(0.86, "memuat orangutan…");
+        return Orang.load(function () {});
+      }
+      return false;
+    }).then(function (ok) {
+      if (window.Orang && !ok) {
+        console.warn("[jaga hutan] orangutan unavailable, using the old rig");
+      }
       /* the boss + crew models are fetched after the title is up */
       try { Models.loadRest(function () {}); } catch (e) {}
       try {

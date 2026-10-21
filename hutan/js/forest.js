@@ -105,6 +105,50 @@
     }
   };
 
+  /* One oil-palm crown: twelve arching, folded fronds merged into a
+     single buffer geometry of unit radius. Built once; every tree
+     scales it, so 100+ palms cost two draws each.                  */
+  function palmCrownGeometry() {
+    const FRONDS = 12;
+    const SEG = 6;
+    const pos = [];
+    const idx = [];
+    const v = new THREE.Vector3();
+    const m = new THREE.Matrix4();
+    const e = new THREE.Euler();
+
+    for (let f = 0; f < FRONDS; f++) {
+      const base = pos.length / 3;
+      e.set(rand(-0.72, -0.46), (f / FRONDS) * Math.PI * 2 + rand(-0.13, 0.13),
+        rand(-0.13, 0.13), "YXZ");
+      m.makeRotationFromEuler(e);
+
+      for (let i = 0; i <= SEG; i++) {
+        const t = i / SEG;
+        const z = 1.12 * t;
+        const y = -0.74 * t * t;
+        /* widest in the middle, pointed at the tip */
+        const w = 0.105 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.04)), 0.65) + 0.006;
+        for (let k = -1; k <= 1; k++) {
+          v.set(k * w, y + (k === 0 ? w * 0.5 : -w * 0.18), z).applyMatrix4(m);
+          pos.push(v.x, v.y, v.z);
+        }
+      }
+      for (let i = 0; i < SEG; i++) {
+        const a = base + i * 3;
+        const b = base + (i + 1) * 3;
+        idx.push(a, b, a + 1, a + 1, b, b + 1);
+        idx.push(a + 1, b + 1, a + 2, a + 2, b + 1, b + 2);
+      }
+    }
+
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    return g;
+  }
+
   /* ---------------------------------------------------------- Forest */
   function Forest(scene) {
     this.scene = scene;
@@ -157,6 +201,10 @@
     });
     this.geoFruit = new THREE.SphereGeometry(0.55, 6, 5);
     this.matFruit = new THREE.MeshLambertMaterial({ color: 0x9a5a1c, flatShading: true });
+
+    /* the estate palm: all fronds merged into one geometry so a whole
+       crown is a single draw call, shared by every tree and scaled */
+    this.geoCrown = palmCrownGeometry();
 
     this.geoDrum = new THREE.CylinderGeometry(1.05, 1.05, 2.6, 12, 1);
     this.matDrum = new THREE.MeshLambertMaterial({ color: 0x2f6f8e, flatShading: true });
@@ -372,46 +420,51 @@
   };
 
   Forest.prototype.makeTree = function (x, z) {
-    const h = rand(11, 19);
-    const r = rand(3.3, 5.6);
+    const h = rand(12, 20);
+    const r = rand(3.2, 4.6);
     const g = new THREE.Group();
     g.position.set(x, 0, z);
     g.rotation.y = Math.random() * Math.PI * 2;
 
-    const hue = rand(0.24, 0.35);
-    const base = new THREE.Color().setHSL(hue, rand(0.36, 0.54), rand(0.17, 0.27));
-    const bark = new THREE.MeshLambertMaterial({ map: this.barkTex, color: new THREE.Color().setHSL(0.07, 0.34, rand(0.17, 0.26)) });
-    const trunk = new THREE.Mesh(this.geoTrunk, bark);
-    trunk.scale.set(r * 0.3, h * 0.72, r * 0.3);
+    /* a bare ringed trunk — the estate palm has no branches until the crown */
+    const hue = rand(0.22, 0.31);
+    const base = new THREE.Color().setHSL(hue, rand(0.38, 0.55), rand(0.2, 0.29));
+    const bark = new THREE.MeshLambertMaterial({
+      map: this.barkTex,
+      color: new THREE.Color().setHSL(0.085, 0.26, rand(0.36, 0.47))
+    });
+    const trunk = new THREE.Mesh(this.geoPalmTrunk, bark);
+    trunk.scale.set(1.05, h, 1.05);
+    trunk.rotation.y = Math.random() * Math.PI;
     g.add(trunk);
 
     const canopyMat = new THREE.MeshLambertMaterial({
-      color: base.clone(), flatShading: true,
+      color: base.clone(), side: THREE.DoubleSide,
       emissive: new THREE.Color(0x1a0b02), emissiveIntensity: 0.0
     });
 
-    const canopy = new THREE.Group();
-    const blobs = [];
-    const nBlobs = 3 + ((Math.random() * 2) | 0);
-    for (let i = 0; i < nBlobs; i++) {
-      const blob = new THREE.Mesh(this.geoBlob, canopyMat);
-      const s = r * rand(0.62, 0.95);
-      blob.scale.set(s, s * rand(0.72, 0.94), s);
-      blob.position.set(rand(-0.5, 0.5) * r, h * rand(0.62, 0.9), rand(-0.5, 0.5) * r);
-      blob.rotation.set(Math.random(), Math.random(), Math.random());
-      canopy.add(blob);
-      blobs.push(blob);
-    }
-    g.add(canopy);
+    const crown = new THREE.Group();
+    crown.position.y = h;
+    crown.scale.setScalar(r);
+    const leaves = new THREE.Mesh(this.geoCrown, canopyMat);
+    crown.add(leaves);
 
+    /* one fruit bunch tucked under the fronds */
+    const fruit = new THREE.Mesh(this.geoFruit, this.matFruit);
+    fruit.position.set(0.42, -0.36, 0.3);
+    fruit.scale.setScalar(0.42);
+    crown.add(fruit);
+
+    g.add(crown);
     this.group.add(g);
 
     const tree = {
       x: x, z: z, h: h, r: r,
-      group: g, trunk: trunk, canopy: canopy, canopyMat: canopyMat, barkMat: bark,
+      group: g, trunk: trunk, canopy: crown, canopyMat: canopyMat, barkMat: bark,
+      canopyR: r * 0.85,
       baseColor: base.clone(),
       hp: 100, fire: 0, state: "alive",
-      palm: null, palmT: 0, palmTarget: 0,
+      palm: null, palmT: 0, palmTarget: 0, palmTree: true,
       scorch: 0, seed: Math.random()
     };
     return tree;
@@ -621,7 +674,8 @@
     tree.hp = 0;
     this._removeBurning(tree);
     tree.canopy.visible = false;
-    tree.trunk.scale.y = tree.h * 0.34;
+    /* a burnt palm keeps its pole; a broadleaf is cut to a stump */
+    tree.trunk.scale.y = tree.h * (tree.palmTree ? 0.82 : 0.34);
     tree.barkMat.color.setHex(0x241d18);
     tree.barkMat.emissive = new THREE.Color(0x000000);
     FireFX.smokePuff(tree.x, tree.h * 0.3, tree.z, 6, 1);
@@ -888,7 +942,7 @@
 
       const d2cam = cam ? dist2(t.x, t.z, cam.x, cam.z) : 0;
       if (!cam || d2cam < 230 * 230) {
-        FireFX.treeFlame(t.x, t.h * 0.74, t.z, t.fire, dt);
+        FireFX.treeFlame(t.x, t.h * (t.palmTree ? 0.9 : 0.74), t.z, t.fire, dt);
         FireFX.smokePuff(t.x, t.h * 0.66, t.z, 3.2 + t.fire * 2.4, dt);
         if (t.fire > 0.55) FireFX.groundFlame(t.x, t.z, 2.4, dt * 0.6);
       }

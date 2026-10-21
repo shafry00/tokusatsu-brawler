@@ -16,12 +16,13 @@ open http://localhost:8777/hutan/
 
 ## The pitch
 
-A forest is on fire. **Sang Bakar** walks from tree to tree setting it alight, and every
-hectare that burns calls in the **sawit crew** — a plantation outfit that plants oil palms
-on the ashes while you are busy elsewhere. You are Ranger 01, with a water hose, a
-sledgehammer, and three radio calls to a water-bombing Chinook.
+An oil-palm estate is on fire. **Sang Bakar** walks from palm to palm setting it alight,
+and every hectare that burns calls in the **sawit crew** — the plantation outfit that
+replants the ashes while you are busy elsewhere. You are Ranger 01, an **orangutan** in a
+ranger hat, with a water hose, a sledgehammer, and three radio calls to a water-bombing
+Chinook.
 
-Three stages — Taman Nasional, Hutan Gambut, Hutan Hujan — each with its own tree count,
+Three stages — Taman Nasional, Hutan Gambut, Hutan Hujan — each with its own palm count,
 wind, fire spread rate, fog and boss health. Lose when the plantation eats the forest
 (or when the whole forest is gone); win by putting Sang Bakar down for good.
 
@@ -89,15 +90,42 @@ Deliberately sparse, Horizon-style rather than boxy:
 | File | What it owns |
 |---|---|
 | `js/game.js` | scene, camera + canopy occlusion, stages, difficulty, waves, screens, menu wiring |
-| `js/forest.js` | terrain, trees, fire spread, pond/drums, scorch decals, radar stats |
+| `js/forest.js` | terrain, the oil-palm estate, fire spread, pond/drums, scorch decals, radar stats |
 | `js/fire.js` | pooled particles: fire, smoke, water, steam, embers + 4-light pool |
 | `js/player.js` | movement, hose cone, hammer combo, tank, props on the rig, respawn |
+| `js/orang.js` | loads `orang-utan.glb`, scales/grounds it, plays its idle clip, layers the stride |
 | `js/boss.js` | Sang Bakar state machine, soak/douse, fireballs, eye glow, body flames |
 | `js/planters.js` | sawit waves, planting, attacks, worker props |
 | `js/heli.js` | Chinook summon, drop marker, water column |
 | `js/hud.js` | HUD updates, compass, radar, tool wheel, screens |
 | `js/wowok.js` | loads the two wowok scans and fakes a rig with a vertex-shader arm droop |
 | `css/style.css` | HUD, arc menu, screens |
+
+## The orangutan rig
+
+The player is a rigged orangutan scan (`assets/models/orang-utan.glb`) with one 10 s idle
+clip and no walk, jump or attack. `orang.js` therefore plays the clip for breathing and
+mass, then multiplies a procedural layer into the bone quaternions **after** the mixer has
+written the pose each frame:
+
+- thigh/knee/arm swings driven by speed, plus a forward lean, a bob and a side sway
+- a hammer chop on the right arm while a swing is running, a squash on landing, a tuck
+  while jumping, a forward roll on `Q`, and a fall-and-roll on death
+- the clip speeds up with the stride so the body keeps moving while the legs work
+
+The scan's joints are named `Head_14`, `Spine1_23`, `RightHand_9`, `LeftHand_19`; empty
+children named `Head`, `spine_03`, `hand_r` and `hand_l` are added so the engine's prop code
+finds them unchanged. The hat is parented to the head bone with its world rotation cancelled
+(so it sits level) and the tank is bolted to the body at `0.71 × height`, behind the shoulders.
+
+## The palm estate
+
+Every tree is an oil palm: a bare ringed trunk (12–20 units) and a crown of twelve arching,
+folded fronds. All twelve fronds are merged into **one** buffer geometry (`palmCrownGeometry`)
+built once and scaled per tree, so a palm is two draw calls (trunk, crown) plus one fruit
+bunch — lighter than the old three-to-five-blob broadleaf canopy. Each crown keeps its own
+`MeshLambertMaterial` so it can char, glow and burn exactly like the old canopy did; burnt
+palms keep 82 % of their pole instead of being cut to a stump.
 
 ## The wowok rig
 
@@ -136,3 +164,5 @@ screenshots and for eyeballing balance without playing to the boss.
 - Engine, HUD, effects and the CC0 model pack: this repo (see the root `CREDITS.md`).
 - The two `wowok` scans were supplied by the project owner and are **not** part of the
   repo's CC0 pack. Check their licence before redistributing.
+- The orangutan (`assets/models/orang-utan.glb`) was also supplied by the project owner and
+  is **not** covered by the pack's CC0 licence. Check its terms before redistributing.

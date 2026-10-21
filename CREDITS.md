@@ -80,7 +80,16 @@ for it, and `docs/ASSET-PIPELINE.md` explains how to drop your own hero in inste
 
 ## JAGA HUTAN (hutan/)
 
-The forest-fire game reuses the engine and the CC0 pack. Two additional character scans
-(`assets/models/wowok.glb`, `assets/models/wowok-boss.glb`) were supplied by the project
-owner and are excluded from the CC0 licensing of the rest of the pack; verify their
-licence before redistributing.
+The forest-fire game reuses the engine and the CC0 pack. Three additional character scans
+were supplied by the project owner and are excluded from the CC0 licensing of the rest of
+the pack; verify their licence before redistributing:
+
+| File | In-game role | Notes |
+|---|---|---|
+| `assets/models/wowok.glb` | the sawit crew | photogrammetry scan, unrigged |
+| `assets/models/wowok-boss.glb` | Sang Bakar | photogrammetry scan, unrigged |
+| `assets/models/orang-utan.glb` | the player | rigged low-poly scan, one 10 s idle clip, three PNG textures |
+
+The orangutan came from the owner's local downloads (`orang_utan_low_poly.glb`) and no
+licence file shipped with it, so its source and terms are unverified. It is used here for
+a personal project; treat it as **all rights reserved** until the owner confirms otherwise.
