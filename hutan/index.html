@@ -4,9 +4,10 @@
 <meta http-equiv="cache-control" content="no-store">
 <meta http-equiv="pragma" content="no-cache">
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0c08" />
 <title>JAGA HUTAN — Operasi Hujan Buatan</title>
-<link rel="stylesheet" href="css/style.css?v=36" />
+<link rel="stylesheet" href="css/style.css?v=38" />
 </head>
 <body>
 
@@ -159,6 +160,26 @@
     <div id="crosshair"><i></i></div>
   </div>
 
+  <!-- ======================= TOUCH CONTROLS ======================= -->
+  <div id="touch" class="hidden" aria-hidden="true">
+    <div class="stick" id="stick">
+      <i class="stick-ring"></i>
+      <b class="stick-knob" id="stickKnob"></b>
+    </div>
+    <div class="tact">
+      <div class="tact-grid">
+        <button class="tbtn" data-act="swap" type="button">ALAT</button>
+        <button class="tbtn" data-act="jump" type="button">LOMPAT</button>
+        <button class="tbtn" data-act="roll" type="button">GULING</button>
+        <button class="tbtn" data-act="heli" type="button">HELI</button>
+      </div>
+      <button class="tbtn big" id="tFire" type="button"><span>AKSI</span></button>
+    </div>
+    <button class="tbtn pause" id="tPause" type="button" aria-label="Jeda">II</button>
+  </div>
+
+  <div id="rotate" class="hidden"><b>MIRINGKAN PERANGKAT</b><span>layar lebar lebih enak untuk berburu api</span></div>
+
   <!-- ======================= LOADING ======================= -->
   <div id="loading" class="screen">
     <div class="wrap load-wrap">
@@ -173,53 +194,33 @@
   <div id="title" class="screen hidden">
     <div class="veil"></div>
 
-    <div class="brand">
+    <header class="brand">
       <div class="kicker">OPERASI HUJAN BUATAN · 2026</div>
       <h1 class="logo">JAGA<br><em>HUTAN</em></h1>
-      <p class="brand-sub">Hutan gambut terbakar. Sawit menunggu tanah hangus.</p>
       <div class="best" id="saveNote"></div>
-    </div>
+    </header>
 
     <div class="menu">
-      <div class="arc">
-        <div class="arc-ring"></div>
-        <div class="arc-ring inner"></div>
-
+      <nav class="menu-list" aria-label="Menu utama">
         <button class="arc-btn active" id="startBtn" data-tab="mulai" type="button" title="Mulai operasi">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 L20 12 L7 20 Z" /></svg>
           <span>MULAI</span>
         </button>
-
         <button class="arc-btn" data-tab="tahap" type="button" title="Pilih tahap">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M3 19 H21" /><path d="M4 19 V13 L9 9 L14 13 V19" /><path d="M14 19 V10 L18 7 L21 9 V19" />
-          </svg>
           <span>TAHAP</span>
         </button>
-
         <button class="arc-btn" data-tab="sulit" type="button" title="Kesulitan">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 3 L20 6 V12 C20 17 16 20 12 21 C8 20 4 17 4 12 V6 Z" /><path d="M12 8 V13" /><path d="M12 16 V16.4" />
-          </svg>
           <span>KESULITAN</span>
         </button>
-
         <button class="arc-btn" data-tab="cara" type="button" title="Cara main">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="8.5" /><path d="M9.4 9.2 A2.7 2.7 0 0 1 14.6 10 C14.6 12 12 12.2 12 14" /><path d="M12 17 V17.4" />
-          </svg>
           <span>CARA MAIN</span>
         </button>
-
         <button class="arc-btn danger" data-tab="keluar" type="button" title="Keluar">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M10 4 H5 V20 H10" /><path d="M15 8 L20 12 L15 16" /><path d="M20 12 H9" />
-          </svg>
           <span>KELUAR</span>
         </button>
-      </div>
+      </nav>
 
       <div class="panel" id="menuPanel">
+        <button class="sheet-close" id="sheetClose" type="button" aria-label="Tutup panel">×</button>
         <!-- mulai -->
         <section class="pane active" data-pane="mulai">
           <div class="pane-head">
@@ -314,7 +315,18 @@
             <div><kbd>1</kbd><kbd>2</kbd><kbd>TAB</kbd><span>ganti alat</span></div>
             <div><kbd>G</kbd><span>panggil heli</span></div>
             <div><kbd>F</kbd><span>mode dewa</span></div>
-            <div><kbd>ESC</kbd><span>jeda</span><kbd>M</kbd><span>bisu</span></div>
+            <div><kbd>ESC</kbd><span>jeda</span></div>
+            <div><kbd>M</kbd><span>bisu</span></div>
+          </div>
+
+          <div class="keys touch-keys">
+            <div><kbd>STIK KIRI</kbd><span>jalan · dorong jauh untuk lari</span></div>
+            <div><kbd>GESER LAYAR</kbd><span>putar kamera</span></div>
+            <div><kbd>AKSI</kbd><span>semprot / palu (tahan)</span></div>
+            <div><kbd>ALAT</kbd><span>tukar selang &amp; palu</span></div>
+            <div><kbd>LOMPAT</kbd><kbd>GULING</kbd><span>lompat &amp; menggelinding</span></div>
+            <div><kbd>HELI</kbd><span>panggil hujan buatan</span></div>
+            <div><kbd>II</kbd><span>jeda</span></div>
           </div>
         </section>
 
@@ -334,7 +346,11 @@
       </div>
     </div>
 
-    <div class="menu-hint">KLIK IKON · <kbd>ENTER</kbd> MULAI · <kbd>ESC</kbd> KEMBALI</div>
+    <div class="menu-hint">
+      <span class="kbd-hint"><kbd>ENTER</kbd> MULAI</span>
+      <span class="kbd-hint"><kbd>ESC</kbd> KEMBALI</span>
+      <span class="touch-note">SENTUH UNTUK MEMILIH</span>
+    </div>
   </div>
 
   <!-- ======================= PAUSE ======================= -->
@@ -384,18 +400,19 @@
 <script>window.MODEL_BASE = "../assets/models/";</script>
 <script src="../js/lib/GLTFLoader.js"></script>
 <script src="../js/lib/SkeletonUtils.js"></script>
-<script src="../js/audio.js?v=36"></script>
-<script src="../js/fx.js?v=36"></script>
-<script src="../js/models.js?v=36"></script>
-<script src="js/wowok.js?v=36"></script>
-<script src="js/orang.js?v=36"></script>
-<script src="js/fire.js?v=36"></script>
-<script src="js/forest.js?v=36"></script>
-<script src="js/player.js?v=36"></script>
-<script src="js/boss.js?v=36"></script>
-<script src="js/planters.js?v=36"></script>
-<script src="js/heli.js?v=36"></script>
-<script src="js/hud.js?v=36"></script>
-<script src="js/game.js?v=36"></script>
+<script src="../js/audio.js?v=38"></script>
+<script src="../js/fx.js?v=38"></script>
+<script src="../js/models.js?v=38"></script>
+<script src="js/wowok.js?v=38"></script>
+<script src="js/orang.js?v=38"></script>
+<script src="js/fire.js?v=38"></script>
+<script src="js/forest.js?v=38"></script>
+<script src="js/player.js?v=38"></script>
+<script src="js/boss.js?v=38"></script>
+<script src="js/planters.js?v=38"></script>
+<script src="js/heli.js?v=38"></script>
+<script src="js/hud.js?v=38"></script>
+<script src="js/touch.js?v=38"></script>
+<script src="js/game.js?v=38"></script>
 </body>
 </html>

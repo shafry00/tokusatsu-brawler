@@ -47,6 +47,31 @@ The tool wheel on the right is clickable, as are its `1` / `2` key badges. Every
 on the keyboard: the mouse only aims the camera and grabs pointer lock, and the arrow keys
 orbit it without touching the mouse at all.
 
+## On a phone
+
+The menu and the whole HUD adapt to touch. On a coarse pointer (phone, tablet) the keyboard
+stays out of the way and a thumb layout appears over the game:
+
+| Touch | Action |
+|---|---|
+| Left stick | Walk — push past ~90 % of the ring to sprint |
+| Drag anywhere on the view | Look (no pointer lock on touch) |
+| **AKSI** (hold) | Spray the hose / swing the hammer |
+| **ALAT** | Swap hose ↔ hammer (the button shows the tool in hand) |
+| **LOMPAT** / **GULING** | Jump / roll |
+| **HELI** | Call the water-bombing drop |
+| **II** | Pause |
+
+The tool wheel is hidden there (the ALAT button replaces it), the radar moves under the
+forest meters, the field chips sit above the stick and the control hints read for touch.
+Portrait shows a `MIRINGKAN PERANGKAT` nudge for the first few seconds — landscape is the
+intended way to play.
+
+On the title screen the menu is a full-bleed poster: the list runs down the left with a
+brush-stroke highlight on the selected item, and TAHAP / KESULITAN / CARA MAIN slide a panel
+in from the right. Under 820 px of portrait width that panel becomes a bottom sheet with a
+close button, so the artwork stays visible behind the list.
+
 **God mode** (`F`) is for checking the fire, the crew waves and the boss without dying: the
 health bar is pinned, the tank never empties and the radio always has three calls left. The
 amber `∞ MODE DEWA` chip under the water bar shows it is on; `F` again turns it off.
@@ -90,6 +115,7 @@ Deliberately sparse, Horizon-style rather than boxy:
   and the heli drop
 - forest / plantation meters and the score (top right)
 - **tool wheel** (right) with the selected tool's key number, ammo and heli charges
+  (hidden on touch, where the ALAT button carries the tool name)
 - field chips (bottom left): fires burning, sawit alive, tank %
 - boss bar with a soak line (bottom centre), circular radar (bottom right)
 
@@ -106,8 +132,11 @@ Deliberately sparse, Horizon-style rather than boxy:
 | `js/planters.js` | sawit waves, planting, attacks, worker props |
 | `js/heli.js` | Chinook summon, drop marker, water column |
 | `js/hud.js` | HUD updates, compass, radar, tool wheel, screens |
+| `js/touch.js` | virtual stick, action buttons, drag-to-look, HUD hand-off on touch devices |
 | `js/wowok.js` | loads the two wowok scans and fakes a rig with a vertex-shader arm fold plus a walk swing |
-| `css/style.css` | HUD, arc menu, screens |
+| `css/style.css` | poster menu, HUD, screens, touch controls, breakpoints |
+| `img/menu-bg.jpg` | menu artwork (upscaled from the supplied reference) |
+| `img/brush.svg` | the painted stroke behind the selected menu item |
 
 ## The orangutan rig
 
@@ -180,3 +209,5 @@ screenshots and for eyeballing balance without playing to the boss.
   repo's CC0 pack. Check their licence before redistributing.
 - The orangutan (`assets/models/orang-utan.glb`) was also supplied by the project owner and
   is **not** covered by the pack's CC0 licence. Check its terms before redistributing.
+- `img/menu-bg.jpg` is the menu artwork supplied by the project owner; it is bundled locally
+  so the menu works offline. Check its terms before redistributing.

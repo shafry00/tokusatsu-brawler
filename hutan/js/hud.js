@@ -84,12 +84,20 @@
   /* ---------------------------------------------------------- title tabs */
   Hud.setTab = function (tab) {
     Hud._tab = tab;
+    /* phones turn the panel into a sheet, opened only for the info tabs */
+    var title = document.getElementById("title");
+    if (title) title.classList.toggle("showpanel", tab !== "mulai");
     document.querySelectorAll("#title .arc-btn").forEach(function (b) {
       b.classList.toggle("active", b.getAttribute("data-tab") === tab);
     });
     document.querySelectorAll("#menuPanel .pane").forEach(function (p) {
       p.classList.toggle("active", p.getAttribute("data-pane") === tab);
     });
+  };
+
+  Hud.closeSheet = function () {
+    var title = document.getElementById("title");
+    if (title) title.classList.remove("showpanel");
   };
 
   /* ---------------------------------------------------------- banner */

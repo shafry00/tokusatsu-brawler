@@ -383,8 +383,13 @@
 
     Hud.hideScreens();
     Hud.banner("TAHAP " + (idx + 1) + " — " + st.name, st.sub + " · SELAMATKAN HUTAN", 3200);
-    Hud.toast("1 SELANG · 2 PALU · G PANGGIL HELI", "", 3400);
+    if (window.TouchPad && TouchPad.on) {
+      Hud.toast("GESER KIRI: JALAN · GESER LAYAR: LIRIK · AKSI: SEMPROT/PALU", "", 4000);
+    } else {
+      Hud.toast("1 SELANG · 2 PALU · G PANGGIL HELI", "", 3400);
+    }
 
+    if (window.TouchPad && TouchPad.on) return;
     if (!document.pointerLockElement) {
       try { renderer.domElement.requestPointerLock(); } catch (e) {}
     }
@@ -472,6 +477,25 @@
   }
 
   /* ---------------------------------------------------------- input */
+
+  /* keyboard and the touch pad share one action table */
+  function doAction(name) {
+    if (G.state !== "playing" || !player) return;
+    if (name === "hose") player.setWeapon("hose");
+    else if (name === "hammer") player.setWeapon("hammer");
+    else if (name === "swap") player.setWeapon(player.weapon === "hose" ? "hammer" : "hose");
+    else if (name === "heli") callHeli();
+    else if (name === "roll") input.roll = true;
+    else if (name === "jump") input.jump = true;
+    else if (name === "god") {
+      G.god = !G.god;
+      if (player) player.god = G.god;
+      if (window.Hud && Hud.god) Hud.god(G.god);
+      Hud.toast(G.god ? "MODE DEWA · TAK TERKALAHKAN" : "MODE DEWA MATI",
+        G.god ? "ember" : "", 1600);
+    }
+  }
+
   function bindInput() {
     window.addEventListener("keydown", function (e) {
       if (e.repeat) {
@@ -493,28 +517,21 @@
         Hud.toast(G.muted ? "SUARA DIMATIKAN" : "SUARA DINYALAKAN", "", 1200);
         return;
       }
-      if (e.code === "KeyF") {
-        G.god = !G.god;
-        if (player) player.god = G.god;
-        if (window.Hud && Hud.god) Hud.god(G.god);
-        Hud.toast(G.god ? "MODE DEWA · TAK TERKALAHKAN" : "MODE DEWA MATI",
-          G.god ? "ember" : "", 1600);
-        return;
-      }
+      if (e.code === "KeyF") { doAction("god"); return; }
 
       if (G.state !== "playing") return;
 
-      if (e.code === "Digit1") player.setWeapon("hose");
-      else if (e.code === "Digit2") player.setWeapon("hammer");
+      if (e.code === "Digit1") doAction("hose");
+      else if (e.code === "Digit2") doAction("hammer");
       else if (e.code === "Tab") {
         e.preventDefault();
-        player.setWeapon(player.weapon === "hose" ? "hammer" : "hose");
+        doAction("swap");
       } else if (e.code === "KeyG") {
-        callHeli();
+        doAction("heli");
       } else if (e.code === "KeyQ") {
-        input.roll = true;
+        doAction("roll");
       } else if (e.code === "Space") {
-        input.jump = true;
+        doAction("jump");
       }
     });
 
@@ -526,6 +543,7 @@
 
     /* the mouse is for looking only: every action is on the keyboard */
     canvas.addEventListener("mousedown", function (e) {
+      if (window.TouchPad && TouchPad.on) return;
       if (G.state === "playing" && !document.pointerLockElement) {
         try { canvas.requestPointerLock(); } catch (err) {}
       }
@@ -547,11 +565,16 @@
     /* dragging also turns the camera, for when pointer lock is blocked */
     let dragging = false, lx = 0, ly = 0;
     canvas.addEventListener("pointerdown", function (e) {
+      if (e.pointerType === "touch" || e.pointerType === "pen") return;
       if (document.pointerLockElement === canvas) return;
       dragging = true; lx = e.clientX; ly = e.clientY;
     });
-    window.addEventListener("pointerup", function () { dragging = false; });
+    window.addEventListener("pointerup", function (e) {
+      if (e.pointerType === "touch" || e.pointerType === "pen") return;
+      dragging = false;
+    });
     window.addEventListener("pointermove", function (e) {
+      if (e.pointerType === "touch" || e.pointerType === "pen") return;
       if (!dragging || document.pointerLockElement === canvas) return;
       cam.yaw -= (e.clientX - lx) * 0.006;
       cam.pitch = clamp(cam.pitch - (e.clientY - ly) * 0.004, -0.95, 0.16);
@@ -599,6 +622,14 @@
         Hud.setTab(tab);
       });
     });
+
+    const sheetClose = document.getElementById("sheetClose");
+    if (sheetClose) {
+      sheetClose.addEventListener("click", function () {
+        if (Hud.closeSheet) Hud.closeSheet();
+        if (window.Audio2) Audio2.sfx("ui");
+      });
+    }
 
     document.querySelectorAll("#stageOpts .opt").forEach(function (b) {
       b.addEventListener("click", function () {
@@ -691,6 +722,7 @@
     if (G.state !== "paused") return;
     G.state = "playing";
     Hud.hideScreens();
+    if (window.TouchPad && TouchPad.on) return;
     try { renderer.domElement.requestPointerLock(); } catch (e) {}
   }
 
@@ -698,13 +730,20 @@
   function update(dt, raw) {
     G.stageTime += dt;
 
-    input.forward = !!keys.KeyW;
-    input.back = !!keys.KeyS;
-    input.left = !!keys.KeyA;
-    input.right = !!keys.KeyD;
-    input.sprint = !!(keys.ShiftLeft || keys.ShiftRight);
+    /* the touch stick is analog: it feeds the same booleans, with a deadzone */
+    const touch = window.TouchPad && TouchPad.on ? TouchPad : null;
+    let ax = (keys.KeyD ? 1 : 0) - (keys.KeyA ? 1 : 0);
+    let az = (keys.KeyW ? 1 : 0) - (keys.KeyS ? 1 : 0);
+    if (touch) { ax += touch.move.x; az -= touch.move.y; }
+    const dead = 0.24;
+    input.forward = az > dead;
+    input.back = az < -dead;
+    input.right = ax > dead;
+    input.left = ax < -dead;
+    input.sprint = !!(keys.ShiftLeft || keys.ShiftRight) ||
+      (!!touch && Math.hypot(ax, az) > 0.92);
     /* J is the action button: hold to spray, hold to keep swinging */
-    input.fire = !!keys.KeyJ;
+    input.fire = !!keys.KeyJ || (!!touch && touch.fire);
 
     /* the arrow keys turn the camera, in the same directions as the mouse */
     const lookX = (keys.ArrowLeft ? 1 : 0) - (keys.ArrowRight ? 1 : 0);
@@ -933,6 +972,7 @@
   function frame() {
     requestAnimationFrame(frame);
     const raw = Math.min(0.05, clock.getDelta());
+    if (window.TouchPad) TouchPad.sync(G.state);
 
     if (G.state === "playing") {
       FX.update(raw);
@@ -964,6 +1004,9 @@
 
   window.JagaHutan = {
     startGame: startGame,
+    action: doAction,
+    pause: pauseGame,
+    resume: resumeGame,
     /* dev handles: used to drive the game from the console while tuning */
     debug: {
       cam: cam, input: input, stages: STAGES,
