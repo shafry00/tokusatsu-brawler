@@ -12,6 +12,8 @@ open http://localhost:8777/hutan/
 
 `file://` will not work: models are loaded with `fetch()`.
 
+**Live:** <https://karhutla.larutmalam.id> — see [Hosting](#hosting) below.
+
 ---
 
 ## The pitch
@@ -201,6 +203,40 @@ calls it for N ms advances the sim by N seconds, which is how the captures were 
 
 `/hutan/?shot=hud|fire|boss` auto-starts a stage and frames a scene; used for capturing
 screenshots and for eyeballing balance without playing to the boss.
+
+## Hosting
+
+The game lives at **<https://karhutla.larutmalam.id>** on Cloudflare, as a Worker with
+static assets behind it. Two files own that:
+
+| File | What it does |
+|---|---|
+| `tools/build-hutan.sh` | packs `dist-hutan/` — the game, the six engine files it borrows, the model pack. Nothing else (no `.git`, no other games). |
+| `tools/hutan-worker.js` | answers `/` with `hutan/index.html` plus `<base href="/hutan/">`; every other request falls through to the assets. |
+| `wrangler.hutan.toml` | worker name, assets dir, the `karhutla.larutmalam.id` custom domain. |
+
+The `<base>` is the whole trick: the page can be opened at the bare domain root while its
+relative paths (`css/…`, `js/…`, `../js/…`, `../assets/models/…`) still resolve as if it
+were served from `/hutan/`. No file is rewritten, so the repo layout stays the only
+source of truth.
+
+```bash
+# after any edit — bump every ?v= in index.html first, then:
+./tools/build-hutan.sh
+CLOUDFLARE_ACCOUNT_ID=76e11d83a072dcd071384dede680a143 wrangler deploy -c wrangler.hutan.toml
+```
+
+`dist-hutan/` is gitignored; the deploy is built from the working tree, not from git.
+The zone is in the same Cloudflare account, so `custom_domain = true` creates the DNS
+record and the certificate on the first deploy. To preview before shipping:
+
+```bash
+wrangler dev -c wrangler.hutan.toml --port 8891
+curl -s http://127.0.0.1:8891/ | head -5     # expect the <base> tag
+```
+
+`run_worker_first = true` matters: without it the asset layer answers `/` with a 307 to
+`/hutan/` and the worker never runs.
 
 ## Credits
 

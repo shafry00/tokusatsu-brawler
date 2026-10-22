@@ -58,6 +58,9 @@ water-bombing helicopter.
 open http://localhost:8777/hutan/
 ```
 
+Live at **<https://karhutla.larutmalam.id>** (Cloudflare Worker + static assets — see
+[`docs/DEPLOY.md`](docs/DEPLOY.md#the-forest-game-karhutlalarutmalamid)).
+
 It has its own HUD, a gold arc main menu, three stages and a difficulty setting. The
 characters are two unrigged photogrammetry scans (`wowok`) animated by a vertex-shader
 arm droop rather than a skeleton — see [`hutan/README.md`](hutan/README.md).

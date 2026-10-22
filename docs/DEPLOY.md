@@ -66,6 +66,37 @@ rsync -a --exclude '_orig' --exclude 'notes' --exclude 'tools/out' ./ dist/
 `.gitignore` is not a deploy filter. Anything in the directory you point wrangler at gets
 uploaded.
 
+## The forest game: karhutla.larutmalam.id
+
+`hutan/` is deployed separately from the brawler, at the root of its own domain, as a
+**Worker with static assets** (not the `tokusatsu-brawler` Pages project). Its configs:
+
+| File | Role |
+|---|---|
+| `wrangler.hutan.toml` | worker `karhutla-hutan`, `[assets] directory = ./dist-hutan`, `run_worker_first = true`, `[[routes]] karhutla.larutmalam.id` with `custom_domain = true` |
+| `tools/build-hutan.sh` | builds `dist-hutan/` (game + the six engine files + the model pack; gitignored) |
+| `tools/hutan-worker.js` | serves `/` from `hutan/` with an injected `<base href="/hutan/">` |
+
+The base tag is why the game can open at the bare domain while its relative URLs
+(`../js/three.min.js`, `../assets/models/…`) keep working — it is the same URL resolution
+as serving from `/hutan/`, minus any file rewriting.
+
+```bash
+./tools/build-hutan.sh
+CLOUDFLARE_ACCOUNT_ID=76e11d83a072dcd071384dede680a143 wrangler deploy -c wrangler.hutan.toml
+```
+
+Notes that cost time to rediscover:
+
+- `compatibility_date` must be ≤ the newest date the local workerd supports; wrangler
+  refuses to boot and names the ceiling in the error.
+- Without `run_worker_first = true` the asset layer answers `/` with a `307` to `/hutan/`
+  before the worker is ever invoked.
+- `/hutan/index.html` also `307`s to `/hutan/` (Cloudflare's `auto-trailing-slash`), so the
+  worker fetches `/hutan/`, not the file path.
+- `.glb` ships as `model/gltf-binary`; `GLTFLoader` only needs the bytes, so that is fine.
+  `index.html` is returned `no-cache` and the `?v=` query does the rest.
+
 ## Size notes
 
 For reference, the whole game with the CC0 pack is ~12 MB:

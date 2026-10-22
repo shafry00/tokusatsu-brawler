@@ -1,0 +1,30 @@
+# JAGA HUTAN — https://karhutla.larutmalam.id
+#
+# The game is one static page plus a CC0 model pack, so it deploys as a Worker
+# with static assets. The worker (`tools/hutan-worker.js`) exists for one
+# reason: serving the game at the bare root with a <base href="/hutan/">.
+#
+#   ./tools/build-hutan.sh
+#   wrangler deploy -c wrangler.hutan.toml
+#
+# Everything below `dist-hutan/` is generated and gitignored.
+
+name = "karhutla-hutan"
+main = "tools/hutan-worker.js"
+compatibility_date = "2026-04-17"
+
+[assets]
+directory = "./dist-hutan"
+binding = "ASSETS"
+# the worker owns "/" (assets would otherwise answer it with a redirect to
+# /hutan/); every other request is passed straight through to the asset layer
+run_worker_first = true
+
+[observability]
+enabled = true
+
+# the zone lives in the same account, so wrangler creates the DNS record and
+# the certificate for us
+[[routes]]
+pattern = "karhutla.larutmalam.id"
+custom_domain = true

@@ -11,6 +11,10 @@ __pycache__/
 .venv/
 venv/
 
+# deploy output (tools/build-hutan.sh; uploaded by wrangler)
+dist-hutan/
+.wrangler/
+
 # pipeline scratch
 tools/out/
 tools/models/*
