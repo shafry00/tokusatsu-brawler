@@ -31,6 +31,7 @@ wind, fire spread rate, fog and boss health. Lose when the plantation eats the f
 | Key | Action |
 |---|---|
 | `W A S D` | Move |
+| Arrow keys | Turn the camera — `←` `→` yaw, `↑` `↓` pitch |
 | Mouse | Look (pointer lock; click-drag also works) |
 | `Shift` | Sprint |
 | `Space` | Jump |
@@ -43,7 +44,8 @@ wind, fire spread rate, fog and boss health. Lose when the plantation eats the f
 | `M` | Mute |
 
 The tool wheel on the right is clickable, as are its `1` / `2` key badges. Every action is
-on the keyboard: the mouse only aims the camera and grabs pointer lock.
+on the keyboard: the mouse only aims the camera and grabs pointer lock, and the arrow keys
+orbit it without touching the mouse at all.
 
 **God mode** (`F`) is for checking the fire, the crew waves and the boss without dying: the
 health bar is pinned, the tank never empties and the radio always has three calls left. The
@@ -104,7 +106,7 @@ Deliberately sparse, Horizon-style rather than boxy:
 | `js/planters.js` | sawit waves, planting, attacks, worker props |
 | `js/heli.js` | Chinook summon, drop marker, water column |
 | `js/hud.js` | HUD updates, compass, radar, tool wheel, screens |
-| `js/wowok.js` | loads the two wowok scans and fakes a rig with a vertex-shader arm droop |
+| `js/wowok.js` | loads the two wowok scans and fakes a rig with a vertex-shader arm fold plus a walk swing |
 | `css/style.css` | HUD, arc menu, screens |
 
 ## The orangutan rig
@@ -139,14 +141,20 @@ The wowok scans (`assets/models/wowok.glb` for the crew, `wowok-boss.glb` for th
 are unrigged photogrammetry. Instead of a skeleton, `wowok.js` clones the mesh per actor
 and patches its material with a small vertex shader:
 
-- `uDroop` pulls vertices below the shoulders down toward the hips, which turns the scan's
-  T-pose into arms hanging by the sides (the crew uses `1.0`, the boss `0.46` so he keeps
-  a wide, arms-out silhouette).
-- `uSwing`, `uBob`, `uLean` and a lunge term are driven per actor every frame, so each unit
+- `uDroop` rotates each arm about its shoulder, which turns the scan's T-pose into arms
+  hanging by the sides (the crew uses `1.0`, the boss `0.62` so it keeps a wide,
+  arms-out silhouette).
+- `uSwing` / `uSwingB` add an extra angle to the right and left arm for a chop; `atk2`
+  (the planting swing) drives both, `atk1` keeps the off hand as follow-through.
+- `uGait` swings the hanging arms fore and aft, the two sides in opposite phase: a slow
+  breath at rest, a full stride at a run, so the crew never walks like a mannequin.
+- `uBob`, `uLean` and a lunge term are driven per actor every frame, so each unit
   walks, breathes and dies independently on one shared geometry.
 
-Height, tint, glow and facing are per actor. If the GLBs are missing, the game falls back
-to `kaiju_birdon` and then to primitives — it never blocks on a download.
+The scans are modelled facing **+Z** — the same axis `yaw` is measured from — so the mesh
+needs no flip, and `yaw = atan2(dx, dz)` walks a unit exactly where it looks. Height, tint,
+glow and facing are per actor. If the GLBs are missing, the game falls back to
+`kaiju_birdon` and then to primitives — it never blocks on a download.
 
 ## Dev hooks
 

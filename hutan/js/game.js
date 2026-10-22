@@ -475,12 +475,12 @@
   function bindInput() {
     window.addEventListener("keydown", function (e) {
       if (e.repeat) {
-        if (e.code === "Space") e.preventDefault();
+        if (e.code === "Space" || e.code.indexOf("Arrow") === 0) e.preventDefault();
         return;
       }
       keys[e.code] = true;
 
-      if (e.code === "Space") e.preventDefault();
+      if (e.code === "Space" || e.code.indexOf("Arrow") === 0) e.preventDefault();
 
       if (e.code === "Escape") {
         if (G.state === "playing") pauseGame();
@@ -698,13 +698,19 @@
   function update(dt, raw) {
     G.stageTime += dt;
 
-    input.forward = !!(keys.KeyW || keys.ArrowUp);
-    input.back = !!(keys.KeyS || keys.ArrowDown);
-    input.left = !!(keys.KeyA || keys.ArrowLeft);
-    input.right = !!(keys.KeyD || keys.ArrowRight);
+    input.forward = !!keys.KeyW;
+    input.back = !!keys.KeyS;
+    input.left = !!keys.KeyA;
+    input.right = !!keys.KeyD;
     input.sprint = !!(keys.ShiftLeft || keys.ShiftRight);
     /* J is the action button: hold to spray, hold to keep swinging */
     input.fire = !!keys.KeyJ;
+
+    /* the arrow keys turn the camera, in the same directions as the mouse */
+    const lookX = (keys.ArrowLeft ? 1 : 0) - (keys.ArrowRight ? 1 : 0);
+    const lookY = (keys.ArrowUp ? 1 : 0) - (keys.ArrowDown ? 1 : 0);
+    if (lookX) cam.yaw += lookX * 1.9 * dt;
+    if (lookY) cam.pitch = clamp(cam.pitch + lookY * 1.05 * dt, -0.95, 0.16);
 
     const ctx = {
       camera: camera,

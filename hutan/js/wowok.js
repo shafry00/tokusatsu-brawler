@@ -96,9 +96,12 @@
 
     this.uDroop = { value: opt.droop === undefined ? 1.0 : opt.droop };
     this.uSwing = { value: 0 };
+    this.uSwingB = { value: 0 };
+    this.uGait = { value: 0 };
     this.droopBase = this.uDroop.value;
     this.swingT = 0;
     this.swingDur = 0.5;
+    this.swingBoth = false;
     this.lungeT = 0;
     this.deadT = 0;
     this.fade = 1;
@@ -120,24 +123,38 @@
       mat.onBeforeCompile = function (sh) {
         sh.uniforms.uDroop = self.uDroop;
         sh.uniforms.uSwing = self.uSwing;
-        sh.vertexShader = "uniform float uDroop;\nuniform float uSwing;\n" + sh.vertexShader;
+        sh.uniforms.uSwingB = self.uSwingB;
+        sh.uniforms.uGait = self.uGait;
+        sh.vertexShader = "uniform float uDroop;\nuniform float uSwing;\n" +
+          "uniform float uSwingB;\nuniform float uGait;\n" + sh.vertexShader;
         sh.vertexShader = sh.vertexShader.replace(
           "#include <begin_vertex>",
           [
             "vec3 transformed = vec3(position);",
             "{",
+            /* the shoulders are the two pivots the arms hang from */
             "  float sx = position.x < 0.0 ? -1.0 : 1.0;",
             "  float ax = abs(position.x);",
-            "  float t = clamp((ax - 0.19) / 0.72, 0.0, 1.0);",
+            "  float t = clamp((ax - 0.19) / 0.42, 0.0, 1.0);",
             "  float grip = smoothstep(0.92, 1.30, position.y);",
-            "  float extra = sx > 0.0 ? uSwing : 0.0;",
-            "  float ang = (uDroop * 1.52 + extra) * t * grip;",
+            "  float arm = t * grip;",
+            /* fold the T-pose down, plus any swing on that arm */
+            "  float extra = sx > 0.0 ? uSwing : uSwingB;",
+            "  float ang = (uDroop * 1.52 + extra) * arm;",
             "  float th = -sx * ang;",
             "  float c = cos(th), s = sin(th);",
             "  float dx = position.x - sx * 0.19;",
             "  float dy = position.y - 1.42;",
             "  transformed.x = sx * 0.19 + dx * c - dy * s;",
             "  transformed.y = 1.42 + dx * s + dy * c;",
+            /* once the arm hangs, swing it fore/aft from the shoulder,
+               the two sides in opposite phase once uGait is driven */
+            "  float ga = uGait * sx * arm;",
+            "  float gc = cos(ga), gs = sin(ga);",
+            "  float gy = transformed.y - 1.42;",
+            "  float gz = transformed.z;",
+            "  transformed.y = 1.42 + gy * gc - gz * gs;",
+            "  transformed.z = gy * gs + gz * gc;",
             "}"
           ].join("\n")
         );
@@ -145,7 +162,7 @@
       this.mat = mat;
       this.mesh = new THREE.Mesh(pack.geo, mat);
       this.mesh.scale.setScalar(this.scale);
-      this.mesh.rotation.y = Math.PI;      // the scan looks down -Z
+      /* the scan faces +Z, the same axis yaw is measured from, so no flip */
       this.mesh.frustumCulled = false;
       this.inner.add(this.mesh);
 
@@ -196,6 +213,7 @@
     if (slot === "slash" || slot === "atk1" || slot === "atk2") {
       this.swingT = 0.0001;
       this.swingDur = slot === "atk2" ? 0.7 : 0.48;
+      this.swingBoth = slot === "atk2";   // planting is a two-handed chop
       this.lungeT = 0.0001;
       return;
     }
@@ -236,6 +254,12 @@
       this.uSwing.value *= Math.max(0, 1 - dt * 9);
       if (Math.abs(this.uSwing.value) < 0.01) this.uSwing.value = 0;
     }
+    /* the other arm follows a swipe, and joins a two-handed chop */
+    this.uSwingB.value = this.uSwing.value * (this.swingBoth ? 0.9 : 0.22);
+
+    /* ---- arms: a breath when still, a stride once walking ---- */
+    const stride = 0.09 + sp * 0.42;
+    this.uGait.value = Math.sin(this.t * (3.0 + sp * 3.4)) * stride;
 
     /* ---- lunge ---- */
     let lunge = 0;
